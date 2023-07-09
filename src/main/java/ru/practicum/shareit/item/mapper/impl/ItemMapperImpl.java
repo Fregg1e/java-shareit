@@ -1,9 +1,11 @@
 package ru.practicum.shareit.item.mapper.impl;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 
+@Component
 public class ItemMapperImpl implements ItemMapper {
     @Override
     public ItemDto toItemDto(Item item) {
@@ -12,20 +14,18 @@ public class ItemMapperImpl implements ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .owner(item.getOwner())
-                .request(item.getRequest())
                 .build();
     }
 
     @Override
-    public Item toItem(ItemDto itemDto) {
+    public Item toItem(ItemDto itemDto, Long owner, Long request) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
-                .owner(itemDto.getOwner())
-                .request(itemDto.getRequest())
+                .owner(owner)
+                .request(request)
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -12,6 +13,7 @@ import ru.practicum.shareit.validator.UserDtoValidator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -34,13 +36,14 @@ public class UserServiceImpl implements UserService {
     public UserDto create(UserDto userDto) {
         UserDtoValidator.validateUserDto(userDto);
         User user = userMapper.toUser(userDto);
+        log.debug("Создан пользователь: {}", user);
         return userMapper.toUserDto(userStorage.create(user));
     }
 
     @Override
     public UserDto update(Long id, UserDto userDto) {
-        UserDto updatebleUserDto = getById(id);
         UserDtoValidator.validateAllFieldNotNull(userDto);
+        UserDto updatebleUserDto = getById(id);
         if (userDto.getName() != null) {
             UserDtoValidator.validateName(userDto);
             updatebleUserDto.setName(userDto.getName());
@@ -49,11 +52,13 @@ public class UserServiceImpl implements UserService {
             UserDtoValidator.validateEmail(userDto);
             updatebleUserDto.setEmail(userDto.getEmail());
         }
+        log.debug("Пользователь с id={} обновлен.", updatebleUserDto.getId());
         return userMapper.toUserDto(userStorage.update(id, userMapper.toUser(updatebleUserDto)));
     }
 
     @Override
     public void deleteById(Long id) {
         userStorage.deleteById(id);
+        log.debug("Пользователь с id={} удален.", id);
     }
 }

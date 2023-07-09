@@ -27,7 +27,7 @@ public class UserDtoValidator {
 
     public static void validateAllFieldNotNull(UserDto userDto) {
         if (userDto.getName() == null && userDto.getEmail() == null) {
-            logAndThrowException("\"Произошло исключение! Все поля пустые.");
+            logAndThrowException("Произошло исключение! Все поля пустые.");
         }
     }
 

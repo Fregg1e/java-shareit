@@ -25,12 +25,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getById(Long id) {
-        if (!users.containsKey(id)) {
-            log.error("Произошло исключение! Пользователя с ID = {} не существует.", id);
-            throw new NotFoundException(String.format("Пользователя с ID = %d не существует.", id));
+    public User getById(Long userId) {
+        if (!users.containsKey(userId)) {
+            log.error("Произошло исключение! Пользователя с ID = {} не существует.", userId);
+            throw new NotFoundException(String.format("Пользователя с ID = %d не существует.", userId));
         }
-        return users.get(id);
+        return users.get(userId);
     }
 
     @Override
@@ -46,19 +46,19 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User update(Long id, User user) {
-        if (users.containsValue(user) && !users.get(id).equals(user)) {
+    public User update(Long userId, User user) {
+        if (users.containsValue(user) && !users.get(userId).equals(user)) {
             log.error("Произошло исключение! Пользователь с Email = {} уже существует.", user.getEmail());
             throw new AlreadyExistException(String.format("Пользователь с Email = %s уже существует.",
                     user.getEmail()));
         }
-        users.put(id, user);
+        users.put(userId, user);
         return user;
     }
 
     @Override
-    public void deleteById(Long id) {
-        users.remove(id);
+    public void deleteById(Long userId) {
+        users.remove(userId);
     }
 
     private Long getId() {
