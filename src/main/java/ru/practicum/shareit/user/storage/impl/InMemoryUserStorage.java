@@ -35,30 +35,29 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        if (users.containsValue(user)) {
-            log.error("Произошло исключение! Пользователь с Email = {} уже существует.", user.getEmail());
-            throw new AlreadyExistException(String.format("Пользователь с Email = %s уже существует.",
-                                            user.getEmail()));
-        }
+        checkEmailIsFree(user.getId(), user);
         user.setId(getId());
         users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User update(Long userId, User user) {
-        if (users.containsValue(user) && !users.get(userId).equals(user)) {
-            log.error("Произошло исключение! Пользователь с Email = {} уже существует.", user.getEmail());
-            throw new AlreadyExistException(String.format("Пользователь с Email = %s уже существует.",
-                    user.getEmail()));
-        }
-        users.put(userId, user);
+    public User update(User user) {
         return user;
     }
 
     @Override
     public void deleteById(Long userId) {
         users.remove(userId);
+    }
+
+    @Override
+    public void checkEmailIsFree(Long userId, User user) {
+        if (users.containsValue(user) && !users.get(userId).equals(user)) {
+            log.error("Произошло исключение! Пользователь с Email = {} уже существует.", user.getEmail());
+            throw new AlreadyExistException(String.format("Пользователь с Email = %s уже существует.",
+                    user.getEmail()));
+        }
     }
 
     private Long getId() {

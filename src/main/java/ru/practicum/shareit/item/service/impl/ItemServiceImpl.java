@@ -26,17 +26,19 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
+    public List<ItemDto> getAll() {
+        return itemStorage.getAll().stream()
+                .map(itemMapper::toItemDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ItemDto getItemById(Long itemId) {
         return itemMapper.toItemDto(itemStorage.getItemById(itemId));
     }
 
     @Override
-    public List<ItemDto> getItemsByUserIdOrGetAll(Long userId) {
-        if (userId == null) {
-            return itemStorage.getAll().stream()
-                    .map(itemMapper::toItemDto)
-                    .collect(Collectors.toList());
-        }
+    public List<ItemDto> getItemsByUserId(Long userId) {
         User user = userStorage.getById(userId);
         return itemStorage.getItemsByUserId(user.getId()).stream()
                 .map(itemMapper::toItemDto)
@@ -57,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(Long userId, ItemDto itemDto) {
         User user = userStorage.getById(userId);
         ItemDtoValidator.validateItemDto(itemDto);
-        Item item = itemMapper.toItem(itemDto, user.getId(), null);
+        Item item = itemMapper.toItem(itemDto, user.getId());
         return itemMapper.toItemDto(itemStorage.create(item));
     }
 
@@ -65,8 +67,8 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {
         ItemDtoValidator.validateAllFieldNotNull(itemDto);
         User user = userStorage.getById(userId);
-        ItemDto updatebleItemDto = getItemById(itemId);
-        if (!itemStorage.getItemOwnerId(itemId).equals(userId)) {
+        Item item = itemStorage.getItemById(itemId);
+        if (!itemStorage.getItemOwnerId(itemId).equals(user.getId())) {
             log.error("Произошло исключение! Отказано в доступе пользователь с ID = {} "
                     + "к вещи с ID = {}.", userId, itemId);
             throw new AccessException(String.format("Отказано в доступе пользователь с ID = %d "
@@ -74,18 +76,17 @@ public class ItemServiceImpl implements ItemService {
         }
         if (itemDto.getName() != null) {
             ItemDtoValidator.validateName(itemDto);
-            updatebleItemDto.setName(itemDto.getName());
+            item.setName(itemDto.getName());
         }
         if (itemDto.getDescription() != null) {
             ItemDtoValidator.validateDescription(itemDto);
-            updatebleItemDto.setDescription(itemDto.getDescription());
+            item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
             ItemDtoValidator.validateAvailable(itemDto);
-            updatebleItemDto.setAvailable(itemDto.getAvailable());
+            item.setAvailable(itemDto.getAvailable());
         }
-        Item item = itemMapper.toItem(updatebleItemDto, user.getId(), null);
-        log.debug("Вещь с id={} обновлена.", updatebleItemDto.getId());
+        log.debug("Вещь с id={} обновлена.", item.getId());
         return itemMapper.toItemDto(itemStorage.update(itemId, item));
     }
 

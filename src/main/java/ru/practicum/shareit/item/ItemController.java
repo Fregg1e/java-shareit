@@ -13,15 +13,19 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
 
+    @GetMapping("/all")
+    public List<ItemDto> getAll() {
+        return itemService.getAll();
+    }
+
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@PathVariable("itemId") Long itemId) {
         return itemService.getItemById(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByUserIdOrGetAll(@RequestHeader(value = "X-Sharer-User-Id",
-            required = false) Long userId) {
-        return itemService.getItemsByUserIdOrGetAll(userId);
+    public List<ItemDto> getItemsByUserId(@RequestHeader(value = "X-Sharer-User-Id") Long userId) {
+        return itemService.getItemsByUserId(userId);
     }
 
     @GetMapping("/search")

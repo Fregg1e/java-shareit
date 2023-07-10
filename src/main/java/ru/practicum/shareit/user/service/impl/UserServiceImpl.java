@@ -43,17 +43,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(Long id, UserDto userDto) {
         UserDtoValidator.validateAllFieldNotNull(userDto);
-        UserDto updatebleUserDto = getById(id);
-        if (userDto.getName() != null) {
-            UserDtoValidator.validateName(userDto);
-            updatebleUserDto.setName(userDto.getName());
-        }
+        User updatebleUser = userStorage.getById(id);
         if (userDto.getEmail() != null) {
             UserDtoValidator.validateEmail(userDto);
-            updatebleUserDto.setEmail(userDto.getEmail());
+            userStorage.checkEmailIsFree(id, userMapper.toUser(userDto));
+            updatebleUser.setEmail(userDto.getEmail());
         }
-        log.debug("Пользователь с id={} обновлен.", updatebleUserDto.getId());
-        return userMapper.toUserDto(userStorage.update(id, userMapper.toUser(updatebleUserDto)));
+        if (userDto.getName() != null) {
+            UserDtoValidator.validateName(userDto);
+            updatebleUser.setName(userDto.getName());
+        }
+        User user = userStorage.update(updatebleUser);
+        log.debug("Пользователь с id={} обновлен.", user.getId());
+        return userMapper.toUserDto(user);
     }
 
     @Override

@@ -18,14 +18,14 @@ public class ItemMapperImpl implements ItemMapper {
     }
 
     @Override
-    public Item toItem(ItemDto itemDto, Long owner, Long request) {
+    public Item toItem(ItemDto itemDto, Long owner) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .owner(owner)
-                .request(request)
+                .request(itemDto.getRequest())
                 .build();
     }
 }
