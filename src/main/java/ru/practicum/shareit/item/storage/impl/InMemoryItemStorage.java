@@ -77,7 +77,7 @@ public class InMemoryItemStorage implements ItemStorage {
             log.error("Произошло исключение! Вещь с ID = {} не существует.", itemId);
             throw new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId));
         }
-        return items.get(itemId).getOwner();
+        return items.get(itemId).getOwner().getId();
     }
 
     private Long getId() {

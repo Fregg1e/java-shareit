@@ -2,7 +2,9 @@ package ru.practicum.shareit.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.model.AlreadyExistException;
 import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -39,7 +41,11 @@ public class UserServiceImpl implements UserService {
     public UserDto create(UserDto userDto) {
         UserDtoValidator.validateUserDto(userDto);
         User user = userMapper.toUser(userDto);
-        user = userRepository.save(user);
+        try {
+            user = userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistException("Пользователь с таким email уже существует!");
+        }
         log.debug("Создан пользователь: {}", user);
         return userMapper.toUserDto(user);
     }
@@ -47,17 +53,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(Long id, UserDto userDto) {
         UserDtoValidator.validateAllFieldNotNull(userDto);
-        User updatebleUser = userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d не существует.", id)));
         if (userDto.getEmail() != null) {
             UserDtoValidator.validateEmail(userDto);
-            updatebleUser.setEmail(userDto.getEmail());
+            user.setEmail(userDto.getEmail());
         }
         if (userDto.getName() != null) {
             UserDtoValidator.validateName(userDto);
-            updatebleUser.setName(userDto.getName());
+            user.setName(userDto.getName());
         }
-        User user = userRepository.save(updatebleUser);
+        try {
+            user = userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistException("Пользователь с таким email уже существует!");
+        }
         log.debug("Пользователь с id={} обновлен.", user.getId());
         return userMapper.toUserDto(user);
     }

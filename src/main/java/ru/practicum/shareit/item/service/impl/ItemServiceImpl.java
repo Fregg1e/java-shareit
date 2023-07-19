@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.model.AccessException;
+import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.validator.ItemDtoValidator;
 
 import java.util.Collections;
@@ -21,26 +22,30 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
     private final ItemMapper itemMapper;
 
     @Override
     public List<ItemDto> getAll() {
-        return itemStorage.getAll().stream()
+        return itemRepository.findAll().stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto getItemById(Long itemId) {
-        return itemMapper.toItemDto(itemStorage.getItemById(itemId));
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId)));
+        return itemMapper.toItemDto(item);
     }
 
     @Override
     public List<ItemDto> getItemsByUserId(Long userId) {
-        User user = userStorage.getById(userId);
-        return itemStorage.getItemsByUserId(user.getId()).stream()
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
+                        + "не существует.", userId)));
+        return itemRepository.findByOwnerId(user.getId()).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -50,27 +55,30 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty() || text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemStorage.search(text).stream()
+        return itemRepository.search(text).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto create(Long userId, ItemDto itemDto) {
-        User user = userStorage.getById(userId);
         ItemDtoValidator.validateItemDto(itemDto);
-        Item item = itemMapper.toItem(itemDto, user.getId());
-        return itemMapper.toItemDto(itemStorage.create(item));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
+                        + "не существует.", userId)));
+        Item item = itemMapper.toItem(itemDto, user);
+        return itemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
     public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {
         ItemDtoValidator.validateAllFieldNotNull(itemDto);
-        User user = userStorage.getById(userId);
-        Item item = itemStorage.getItemById(itemId);
-        if (!itemStorage.getItemOwnerId(itemId).equals(user.getId())) {
-            log.error("Произошло исключение! Отказано в доступе пользователь с ID = {} "
-                    + "к вещи с ID = {}.", userId, itemId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
+                        + "не существует.", userId)));
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId)));
+        if (!item.getOwner().getId().equals(user.getId())) {
             throw new AccessException(String.format("Отказано в доступе пользователь с ID = %d "
                     + "к вещи с ID = %d.", userId, itemId));
         }
@@ -87,17 +95,17 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
         log.debug("Вещь с id={} обновлена.", item.getId());
-        return itemMapper.toItemDto(itemStorage.update(itemId, item));
+        return itemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
     public void delete(Long itemId, Long userId) {
-        if (!itemStorage.getItemOwnerId(itemId).equals(userId)) {
-            log.error("Произошло исключение! Отказано в доступе пользователь с ID = {} "
-                    + "к вещи с ID = {}.", userId, itemId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId)));
+        if (!item.getOwner().getId().equals(userId)) {
             throw new AccessException(String.format("Отказано в доступе пользователь с ID = %d "
                     + "к вещи с ID = %d.", userId, itemId));
         }
-        itemStorage.delete(itemId, userId);
+        itemRepository.deleteById(itemId);
     }
 }
