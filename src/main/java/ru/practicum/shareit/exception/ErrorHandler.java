@@ -10,10 +10,10 @@ import ru.practicum.shareit.exception.model.*;
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
-    @ExceptionHandler
+    @ExceptionHandler({ValidationException.class, NotAvailableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
-        log.error(e.getMessage());
+    public ErrorResponse handleValidationException(final RuntimeException e) {
+        log.error("Произошло исключение!" + e.getMessage());
         return new ErrorResponse(
                 e.getMessage(),
                 HttpStatus.BAD_REQUEST
@@ -23,7 +23,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleAlreadyExistException(final AlreadyExistException e) {
-        log.error(e.getMessage());
+        log.error("Произошло исключение!" + e.getMessage());
         return new ErrorResponse(
                 e.getMessage(),
                 HttpStatus.CONFLICT
@@ -33,7 +33,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        log.error(e.getMessage());
+        log.error("Произошло исключение!" + e.getMessage());
         return new ErrorResponse(
                 e.getMessage(),
                 HttpStatus.NOT_FOUND
@@ -43,7 +43,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleAccessException(final AccessException e) {
-        log.error(e.getMessage());
+        log.error("Произошло исключение!" + e.getMessage());
         return new ErrorResponse(
                 e.getMessage(),
                 HttpStatus.FORBIDDEN
