@@ -9,5 +9,6 @@ import java.time.LocalDateTime;
 
 public interface CommentMapper {
     Comment toComment(CommentDto commentDto, Item item, User author, LocalDateTime created);
+    
     CommentDto toCommentDto(Comment comment);
 }
