@@ -46,8 +46,8 @@ public class BookingServiceImpl implements BookingService {
                         + "не существует.", userId)));
         switch (bookingState) {
             case CURRENT:
-                return bookingRepository.findByBookerIdAndStatusAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                        user.getId(), BookingStatus.APPROVED, LocalDateTime.now(), LocalDateTime.now()).stream()
+                return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
+                        user.getId(), LocalDateTime.now(), LocalDateTime.now()).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case PAST:
@@ -105,8 +105,8 @@ public class BookingServiceImpl implements BookingService {
                         + "не существует.", ownerId)));
         switch (bookingState) {
             case CURRENT:
-                return bookingRepository.findByItemOwnerIdAndStatusAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                        user.getId(), BookingStatus.APPROVED, LocalDateTime.now(), LocalDateTime.now()).stream()
+                return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
+                        user.getId(), LocalDateTime.now(), LocalDateTime.now()).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case PAST:

@@ -7,8 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingForItemDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.comment.dto.CommentDto;
+import ru.practicum.shareit.comment.mapper.CommentMapper;
+import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.exception.model.AccessException;
+import ru.practicum.shareit.exception.model.NotAvailableException;
 import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -17,6 +23,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.validator.CommentDtoValidator;
 import ru.practicum.shareit.validator.ItemDtoValidator;
 
 import java.time.LocalDateTime;
@@ -31,8 +38,10 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
     private final ItemMapper itemMapper;
     private final BookingMapper bookingMapper;
+    private final CommentMapper commentMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -48,6 +57,9 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId)));
         ItemDto itemDto = itemMapper.toItemDto(item);
+        itemDto.setComments(commentRepository.findByItemId(item.getId()).stream()
+                .map(commentMapper::toCommentDto)
+                .collect(Collectors.toList()));
         if (item.getOwner().getId().equals(userId)) {
             setLastAndNextBooking(itemDto);
         }
@@ -141,17 +153,38 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.deleteById(itemId);
     }
 
+    @Override
+    @Transactional
+    public CommentDto createComment(Long userId, Long itemId,CommentDto commentDto) {
+        CommentDtoValidator.validateText(commentDto);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId)));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
+                        + "не существует.", userId)));
+        List<Booking> bookings = bookingRepository.findByBookerIdAndItemIdAndStatusAndEndIsBefore(user.getId(),
+                item.getId(), BookingStatus.APPROVED, LocalDateTime.now());
+        if (bookings.isEmpty()) {
+            throw new NotAvailableException(String.format("Невозможно создать комментарий к вещи с ID = %d",
+                    item.getId()));
+        }
+        Comment comment = commentMapper.toComment(commentDto, item, user, LocalDateTime.now());
+        return commentMapper.toCommentDto(commentRepository.save(comment));
+    }
+
     private void setLastAndNextBooking(ItemDto itemDto) {
         BookingForItemDto lastBooking = null;
-        List<Booking> pastBookings = bookingRepository.findByItemIdAndEndIsBeforeOrderByEndDesc(itemDto.getId(),
-                LocalDateTime.now());
+        List<Booking> pastBookings = bookingRepository
+                .findByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(itemDto.getId(), BookingStatus.APPROVED,
+                        LocalDateTime.now());
         if (!pastBookings.isEmpty()) {
             lastBooking = bookingMapper.toBookingForItemDto(pastBookings.get(0));
         }
         itemDto.setLastBooking(lastBooking);
         BookingForItemDto nextBooking = null;
-        List<Booking> futureBookings = bookingRepository.findByItemIdAndStartIsAfterOrderByStartAsc(itemDto.getId(),
-                LocalDateTime.now());
+        List<Booking> futureBookings = bookingRepository
+                .findByItemIdAndStatusAndStartIsAfterOrderByStartAsc(itemDto.getId(), BookingStatus.APPROVED,
+                        LocalDateTime.now());
         if (!futureBookings.isEmpty()) {
             nextBooking = bookingMapper.toBookingForItemDto(futureBookings.get(0));
         }
