@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.dto.BookingForItemDto;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -173,7 +173,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void setLastAndNextBooking(ItemDto itemDto) {
-        BookingForItemDto lastBooking = null;
+        BookingDto lastBooking = null;
         List<Booking> pastBookings = bookingRepository
                 .findByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(itemDto.getId(), BookingStatus.APPROVED,
                         LocalDateTime.now());
@@ -181,7 +181,7 @@ public class ItemServiceImpl implements ItemService {
             lastBooking = bookingMapper.toBookingForItemDto(pastBookings.get(0));
         }
         itemDto.setLastBooking(lastBooking);
-        BookingForItemDto nextBooking = null;
+        BookingDto nextBooking = null;
         List<Booking> futureBookings = bookingRepository
                 .findByItemIdAndStatusAndStartIsAfterOrderByStartAsc(itemDto.getId(), BookingStatus.APPROVED,
                         LocalDateTime.now());

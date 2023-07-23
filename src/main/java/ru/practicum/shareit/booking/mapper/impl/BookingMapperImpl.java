@@ -2,9 +2,7 @@ package ru.practicum.shareit.booking.mapper.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.booking.dto.BookingCreationDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingForItemDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -29,16 +27,16 @@ public class BookingMapperImpl implements BookingMapper {
     }
 
     @Override
-    public Booking toBooking(BookingCreationDto bookingCreationDto) {
+    public Booking toBooking(BookingDto bookingDto) {
         return Booking.builder()
-                .start(bookingCreationDto.getStart())
-                .end(bookingCreationDto.getEnd())
+                .start(bookingDto.getStart())
+                .end(bookingDto.getEnd())
                 .build();
     }
 
     @Override
-    public BookingForItemDto toBookingForItemDto(Booking booking) {
-        return BookingForItemDto.builder()
+    public BookingDto toBookingForItemDto(Booking booking) {
+        return BookingDto.builder()
                 .id(booking.getId())
                 .bookerId(booking.getBooker().getId())
                 .start(booking.getStart())

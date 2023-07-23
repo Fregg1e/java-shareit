@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.dto.BookingCreationDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -131,12 +130,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto create(Long userId, BookingCreationDto bookingCreationDto) {
-        BookingCreationDtoValidator.validateBookingCreationDto(bookingCreationDto);
-        Booking booking = bookingMapper.toBooking(bookingCreationDto);
-        Item item = itemRepository.findById(bookingCreationDto.getItemId())
+    public BookingDto create(Long userId, BookingDto bookingDto) {
+        BookingCreationDtoValidator.validateBookingCreationDto(bookingDto);
+        Booking booking = bookingMapper.toBooking(bookingDto);
+        Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.",
-                        bookingCreationDto.getItemId())));
+                        bookingDto.getItemId())));
         if (!item.getAvailable()) {
             throw new NotAvailableException("Вещь не доступна для бронирования!");
         }
@@ -145,7 +144,7 @@ public class BookingServiceImpl implements BookingService {
                         + "не существует.", userId)));
         if (item.getOwner().getId().equals(user.getId())) {
             throw new NotFoundException(String.format("Вещь с ID = %d не существует.",
-                    bookingCreationDto.getItemId()));
+                    bookingDto.getItemId()));
         }
         booking.setItem(item);
         booking.setBooker(user);
