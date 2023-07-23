@@ -22,10 +22,4 @@ public class UserDtoValidator {
             throw new ValidationException("Произошло исключение! Неправильный email.");
         }
     }
-
-    public static void validateAllFieldNotNull(UserDto userDto) {
-        if (userDto.getName() == null && userDto.getEmail() == null) {
-            throw new ValidationException("Произошло исключение! Все поля пустые.");
-        }
-    }
 }

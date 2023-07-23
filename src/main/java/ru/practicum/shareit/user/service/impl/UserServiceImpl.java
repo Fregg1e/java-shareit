@@ -57,7 +57,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto update(Long id, UserDto userDto) {
-        UserDtoValidator.validateAllFieldNotNull(userDto);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d не существует.", id)));
         if (userDto.getEmail() != null) {
