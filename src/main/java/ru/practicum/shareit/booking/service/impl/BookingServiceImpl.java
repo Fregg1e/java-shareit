@@ -16,7 +16,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.validator.BookingCreationDtoValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -131,7 +130,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto create(Long userId, BookingDto bookingDto) {
-        BookingCreationDtoValidator.validateBookingCreationDto(bookingDto);
         Booking booking = bookingMapper.toBooking(bookingDto);
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.",
