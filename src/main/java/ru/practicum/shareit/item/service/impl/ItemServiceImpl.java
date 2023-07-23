@@ -174,19 +174,19 @@ public class ItemServiceImpl implements ItemService {
 
     private void setLastAndNextBooking(ItemDto itemDto) {
         BookingDto lastBooking = null;
-        List<Booking> pastBookings = bookingRepository
-                .findByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(itemDto.getId(), BookingStatus.APPROVED,
+        Booking pastBookings = bookingRepository
+                .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(itemDto.getId(), BookingStatus.APPROVED,
                         LocalDateTime.now());
-        if (!pastBookings.isEmpty()) {
-            lastBooking = bookingMapper.toBookingForItemDto(pastBookings.get(0));
+        if (pastBookings != null) {
+            lastBooking = bookingMapper.toBookingForItemDto(pastBookings);
         }
         itemDto.setLastBooking(lastBooking);
         BookingDto nextBooking = null;
-        List<Booking> futureBookings = bookingRepository
-                .findByItemIdAndStatusAndStartIsAfterOrderByStartAsc(itemDto.getId(), BookingStatus.APPROVED,
+        Booking futureBooking = bookingRepository
+                .findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(itemDto.getId(), BookingStatus.APPROVED,
                         LocalDateTime.now());
-        if (!futureBookings.isEmpty()) {
-            nextBooking = bookingMapper.toBookingForItemDto(futureBookings.get(0));
+        if (futureBooking != null) {
+            nextBooking = bookingMapper.toBookingForItemDto(futureBooking);
         }
         itemDto.setNextBooking(nextBooking);
     }
