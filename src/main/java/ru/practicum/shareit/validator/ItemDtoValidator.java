@@ -4,11 +4,6 @@ import ru.practicum.shareit.exception.model.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 public class ItemDtoValidator {
-    public static void validateItemDto(ItemDto itemDto) {
-        validateName(itemDto);
-        validateDescription(itemDto);
-        validateAvailable(itemDto);
-    }
 
     public static void validateName(ItemDto itemDto) {
         String name = itemDto.getName();
