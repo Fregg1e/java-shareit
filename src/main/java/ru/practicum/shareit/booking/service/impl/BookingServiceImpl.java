@@ -18,7 +18,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.validator.BookingCreationDtoValidator;
-import ru.practicum.shareit.validator.StateValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,17 +33,14 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getBookingsByUserId(Long userId, String state) {
-        BookingState bookingState;
-        if (state != null) {
-            bookingState = StateValidator.validateBookingState(state);
-        } else {
-            bookingState = BookingState.ALL;
+    public List<BookingDto> getBookingsByUserId(Long userId, BookingState state) {
+        if (state == null) {
+            state = BookingState.ALL;
         }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", userId)));
-        switch (bookingState) {
+        switch (state) {
             case CURRENT:
                 return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
                         user.getId(), LocalDateTime.now(), LocalDateTime.now()).stream()
@@ -93,17 +89,14 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getBookingsByOwnerId(Long ownerId, String state) {
-        BookingState bookingState;
-        if (state != null) {
-            bookingState = StateValidator.validateBookingState(state);
-        } else {
-            bookingState = BookingState.ALL;
+    public List<BookingDto> getBookingsByOwnerId(Long ownerId, BookingState state) {
+        if (state == null) {
+            state = BookingState.ALL;
         }
         User user = userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", ownerId)));
-        switch (bookingState) {
+        switch (state) {
             case CURRENT:
                 return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
                         user.getId(), LocalDateTime.now(), LocalDateTime.now()).stream()
