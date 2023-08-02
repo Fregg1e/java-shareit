@@ -15,6 +15,7 @@ public class ItemMapperImpl implements ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
+                .requestId(getRequestIdOrNull(item))
                 .build();
     }
 
@@ -27,5 +28,12 @@ public class ItemMapperImpl implements ItemMapper {
                 .available(itemDto.getAvailable())
                 .owner(owner)
                 .build();
+    }
+
+    private Long getRequestIdOrNull(Item item) {
+        if (item.getRequest() != null) {
+            return item.getRequest().getId();
+        }
+        return null;
     }
 }
