@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -48,10 +49,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getAll() {
-        return itemRepository.findAll().stream()
+    public List<ItemDto> getAll(Integer from, Integer size) {
+        return itemRepository.findAll(PageRequest.of(from > 0 ? from / size : 0, size))
                 .map(itemMapper::toItemDto)
-                .collect(Collectors.toList());
+                .getContent();
     }
 
     @Override
@@ -71,13 +72,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getItemsByUserId(Long userId) {
+    public List<ItemDto> getItemsByUserId(Long userId, Integer from, Integer size) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", userId)));
-        List<ItemDto> itemDtos = itemRepository.findByOwnerId(user.getId()).stream()
+        List<ItemDto> itemDtos = itemRepository.findByOwnerId(user.getId(),
+                        PageRequest.of(from > 0 ? from / size : 0, size))
                 .map(itemMapper::toItemDto)
-                .collect(Collectors.toList());
+                .getContent();
         for (ItemDto itemDto : itemDtos) {
             setLastAndNextBooking(itemDto);
         }
@@ -95,13 +97,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text, Integer from, Integer size) {
         if (text.isEmpty() || text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.search(text).stream()
+        return itemRepository.search(text, PageRequest.of(from > 0 ? from / size : 0, size))
                 .map(itemMapper::toItemDto)
-                .collect(Collectors.toList());
+                .getContent();
     }
 
     @Override
