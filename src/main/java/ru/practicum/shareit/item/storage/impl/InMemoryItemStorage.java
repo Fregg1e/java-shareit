@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Repository
+@Component
 @RequiredArgsConstructor
 public class InMemoryItemStorage implements ItemStorage {
     private final Map<Long, Item> items;
