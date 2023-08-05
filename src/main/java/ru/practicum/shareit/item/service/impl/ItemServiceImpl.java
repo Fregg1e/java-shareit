@@ -165,7 +165,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public CommentDto createComment(Long userId, Long itemId,CommentDto commentDto) {
+    public CommentDto createComment(Long userId, Long itemId, CommentDto commentDto) {
         CommentDtoValidator.validateText(commentDto);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId)));
