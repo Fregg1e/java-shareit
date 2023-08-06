@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -26,6 +25,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.OffsetPageRequest;
 import ru.practicum.shareit.validator.CommentDtoValidator;
 import ru.practicum.shareit.validator.ItemDtoValidator;
 
@@ -50,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemDto> getAll(Integer from, Integer size) {
-        return itemRepository.findAll(PageRequest.of(from > 0 ? from / size : 0, size))
+        return itemRepository.findAll(new OffsetPageRequest(from, size))
                 .map(itemMapper::toItemDto)
                 .getContent();
     }
@@ -76,8 +76,7 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", userId)));
-        List<ItemDto> itemDtos = itemRepository.findByOwnerId(user.getId(),
-                        PageRequest.of(from > 0 ? from / size : 0, size))
+        List<ItemDto> itemDtos = itemRepository.findByOwnerId(user.getId(), new OffsetPageRequest(from, size))
                 .map(itemMapper::toItemDto)
                 .getContent();
         for (ItemDto itemDto : itemDtos) {
@@ -101,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty() || text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.search(text, PageRequest.of(from > 0 ? from / size : 0, size))
+        return itemRepository.search(text, new OffsetPageRequest(from, size))
                 .map(itemMapper::toItemDto)
                 .getContent();
     }

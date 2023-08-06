@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.model.NotFoundException;
@@ -14,6 +13,7 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.OffsetPageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,7 +59,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     public List<ItemRequestDto> getAllRequests(Long userId, Integer from, Integer size) {
         List<ItemRequestDto> requests = itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(userId,
-                        PageRequest.of(from > 0 ? from / size : 0, size))
+                        new OffsetPageRequest(from, size))
                 .map(itemRequestMapper::toItemRequestDto)
                 .getContent();
         for (ItemRequestDto requestDto : requests) {

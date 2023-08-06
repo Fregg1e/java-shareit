@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.mapper.impl.BookingMapperImpl;
 import ru.practicum.shareit.booking.model.Booking;
@@ -71,12 +72,12 @@ class ItemServiceImplTest {
     void getAllTest_whenRepositoryIsEmpty_thenReturnedEmptyList() {
         Integer from = 0;
         Integer size = 2;
-        Mockito.when(itemRepository.findAll(PageRequest.of(0, 2))).thenReturn(Page.empty());
+        Mockito.when(itemRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
 
         List<ItemDto> itemsDto = itemService.getAll(from, size);
 
         assertTrue(itemsDto.isEmpty());
-        Mockito.verify(itemRepository, Mockito.times(1)).findAll(PageRequest.of(0, 2));
+        Mockito.verify(itemRepository, Mockito.times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -86,7 +87,7 @@ class ItemServiceImplTest {
         Item firstItem = Item.builder().id(1L).build();
         Item secondItem = Item.builder().id(2L).build();
         List<Item> items = List.of(firstItem, secondItem);
-        Mockito.when(itemRepository.findAll(PageRequest.of(0, 2))).thenReturn(new PageImpl<>(items));
+        Mockito.when(itemRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(items));
 
         List<ItemDto> itemsDto = itemService.getAll(from, size);
 
@@ -94,7 +95,7 @@ class ItemServiceImplTest {
         assertEquals(2, itemsDto.size());
         assertEquals(firstItem.getId(), itemsDto.get(0).getId());
         assertEquals(secondItem.getId(), itemsDto.get(1).getId());
-        Mockito.verify(itemRepository, Mockito.times(1)).findAll(PageRequest.of(0, 2));
+        Mockito.verify(itemRepository, Mockito.times(1)).findAll(any(Pageable.class));
     }
 
     @Test

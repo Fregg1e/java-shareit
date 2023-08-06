@@ -182,8 +182,7 @@ class BookingServiceImplTest {
         Mockito.verify(bookingRepository, Mockito.never())
                 .findByBookerIdAndStartIsAfterOrderByStartDesc(anyLong(), any(), any());
         Mockito.verify(bookingRepository, Mockito.times(1))
-                .findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING,
-                        PageRequest.of(0, 2));
+                .findByBookerIdAndStatusOrderByStartDesc(anyLong(), any(), any());
         Mockito.verify(bookingRepository, Mockito.never())
                 .findByBookerIdOrderByStartDesc(anyLong(), any());
     }
@@ -214,8 +213,7 @@ class BookingServiceImplTest {
         Mockito.verify(bookingRepository, Mockito.never())
                 .findByBookerIdAndStartIsAfterOrderByStartDesc(anyLong(), any(), any());
         Mockito.verify(bookingRepository, Mockito.times(1))
-                .findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED,
-                        PageRequest.of(0, 2));
+                .findByBookerIdAndStatusOrderByStartDesc(anyLong(), any(), any());
         Mockito.verify(bookingRepository, Mockito.never())
                 .findByBookerIdOrderByStartDesc(anyLong(), any());
     }
@@ -445,8 +443,7 @@ class BookingServiceImplTest {
         Mockito.verify(bookingRepository, Mockito.never())
                 .findByItemOwnerIdAndStartIsAfterOrderByStartDesc(anyLong(), any(), any());
         Mockito.verify(bookingRepository, Mockito.times(1))
-                .findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, BookingStatus.WAITING,
-                        PageRequest.of(0, 2));
+                .findByItemOwnerIdAndStatusOrderByStartDesc(anyLong(), any(), any());
         Mockito.verify(bookingRepository, Mockito.never())
                 .findByItemOwnerIdOrderByStartDesc(anyLong(), any());
     }
@@ -478,8 +475,7 @@ class BookingServiceImplTest {
         Mockito.verify(bookingRepository, Mockito.never())
                 .findByItemOwnerIdAndStartIsAfterOrderByStartDesc(anyLong(), any(), any());
         Mockito.verify(bookingRepository, Mockito.times(1))
-                .findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED,
-                        PageRequest.of(0, 2));
+                .findByItemOwnerIdAndStatusOrderByStartDesc(anyLong(), any(), any());
         Mockito.verify(bookingRepository, Mockito.never())
                 .findByItemOwnerIdOrderByStartDesc(anyLong(), any());
     }

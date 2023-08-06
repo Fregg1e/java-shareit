@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -17,6 +16,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.OffsetPageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,33 +41,32 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case CURRENT:
                 return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), LocalDateTime.now(),
-                                PageRequest.of(from > 0 ? from / size : 0, size))
+                                LocalDateTime.now(), LocalDateTime.now(), new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             case PAST:
                 return bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), PageRequest.of(from > 0 ? from / size : 0, size))
+                                LocalDateTime.now(), new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             case FUTURE:
                 return bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), PageRequest.of(from > 0 ? from / size : 0, size))
+                                LocalDateTime.now(), new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             case WAITING:
                 return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(user.getId(),
-                                BookingStatus.WAITING, PageRequest.of(from > 0 ? from / size : 0, size))
+                                BookingStatus.WAITING, new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             case REJECTED:
                 return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(user.getId(),
-                                BookingStatus.REJECTED, PageRequest.of(from > 0 ? from / size : 0, size))
+                                BookingStatus.REJECTED, new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             default:
                 return bookingRepository.findByBookerIdOrderByStartDesc(user.getId(),
-                                PageRequest.of(from > 0 ? from / size : 0, size))
+                                new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
         }
@@ -99,33 +98,32 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case CURRENT:
                 return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), LocalDateTime.now(),
-                                PageRequest.of(from > 0 ? from / size : 0, size))
+                                LocalDateTime.now(), LocalDateTime.now(), new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             case PAST:
                 return bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), PageRequest.of(from > 0 ? from / size : 0, size))
+                                LocalDateTime.now(), new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             case FUTURE:
                 return bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), PageRequest.of(from > 0 ? from / size : 0, size))
+                                LocalDateTime.now(), new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             case WAITING:
                 return bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(user.getId(),
-                                BookingStatus.WAITING, PageRequest.of(from > 0 ? from / size : 0, size))
+                                BookingStatus.WAITING, new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             case REJECTED:
                 return bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(user.getId(),
-                                BookingStatus.REJECTED, PageRequest.of(from > 0 ? from / size : 0, size))
+                                BookingStatus.REJECTED, new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
             default:
                 return bookingRepository.findByItemOwnerIdOrderByStartDesc(user.getId(),
-                                PageRequest.of(from > 0 ? from / size : 0, size))
+                                new OffsetPageRequest(from, size))
                         .map(bookingMapper::toBookingDto)
                         .getContent();
         }

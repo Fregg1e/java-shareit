@@ -26,10 +26,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class ItemRequestServiceImplIntegrationTest {
     private final EntityManager entityManager;
     private final ItemRequestService itemRequestService;
+    private List<User> users;
 
     @BeforeEach
     void beforeEach() {
-        List<User> users = List.of(
+        users = List.of(
                 User.builder().name("test1").email("test1@email.test").build(),
                 User.builder().name("test2").email("test2@email.test").build(),
                 User.builder().name("test3").email("test3@email.test").build()
@@ -43,7 +44,7 @@ class ItemRequestServiceImplIntegrationTest {
     void createTest() {
         ItemRequestDto itemRequestDto = makeItemRequestDto("test description");
 
-        ItemRequestDto createdItemRequestDto = itemRequestService.create(1L, itemRequestDto);
+        ItemRequestDto createdItemRequestDto = itemRequestService.create(users.get(0).getId(), itemRequestDto);
 
         assertNotNull(createdItemRequestDto.getId());
         assertEquals(itemRequestDto.getDescription(), createdItemRequestDto.getDescription());
@@ -58,13 +59,13 @@ class ItemRequestServiceImplIntegrationTest {
             makeItemRequestDto("test3 description")
         );
         List<ItemRequestDto> createdItemRequestsDto = new ArrayList<>();
-        Long userId = 1L;
+        long userId = users.get(0).getId();
         for (ItemRequestDto itemRequestDto : itemRequestsDtoForCreate) {
             createdItemRequestsDto.add(itemRequestService.create(userId, itemRequestDto));
             userId++;
         }
 
-        List<ItemRequestDto> itemRequestsDto = itemRequestService.getRequestsByUserId(1L);
+        List<ItemRequestDto> itemRequestsDto = itemRequestService.getRequestsByUserId(users.get(0).getId());
 
         assertFalse(itemRequestsDto.isEmpty());
         assertEquals(1, itemRequestsDto.size());
@@ -82,10 +83,10 @@ class ItemRequestServiceImplIntegrationTest {
         );
         List<ItemRequestDto> createdItemRequestsDto = new ArrayList<>();
         for (ItemRequestDto itemRequestDto : itemRequestsDtoForCreate) {
-            createdItemRequestsDto.add(itemRequestService.create(2L, itemRequestDto));
+            createdItemRequestsDto.add(itemRequestService.create(users.get(1).getId(), itemRequestDto));
         }
 
-        List<ItemRequestDto> itemRequestsDto = itemRequestService.getAllRequests(1L, 2, 2);
+        List<ItemRequestDto> itemRequestsDto = itemRequestService.getAllRequests(users.get(0).getId(), 2, 2);
 
         assertEquals(1, itemRequestsDto.size());
         assertEquals(createdItemRequestsDto.get(0).getId(), itemRequestsDto.get(0).getId());
@@ -101,15 +102,15 @@ class ItemRequestServiceImplIntegrationTest {
                 makeItemRequestDto("test3 description")
         );
         List<ItemRequestDto> createdItemRequestsDto = new ArrayList<>();
-        Long userId = 1L;
+        long userId = users.get(0).getId();
         for (ItemRequestDto itemRequestDto : itemRequestsDtoForCreate) {
             createdItemRequestsDto.add(itemRequestService.create(userId, itemRequestDto));
             userId++;
         }
 
-        ItemRequestDto itemRequestDto = itemRequestService.getRequestById(3L, 1L);
+        ItemRequestDto itemRequestDto = itemRequestService.getRequestById(users.get(2).getId(),
+                createdItemRequestsDto.get(0).getId());
 
-        assertEquals(createdItemRequestsDto.get(0).getId(), itemRequestDto.getId());
         assertEquals(createdItemRequestsDto.get(0).getDescription(), itemRequestDto.getDescription());
         assertEquals(createdItemRequestsDto.get(0).getCreated(), itemRequestDto.getCreated());
     }

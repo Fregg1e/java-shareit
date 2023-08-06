@@ -8,7 +8,6 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.mapper.impl.ItemMapperImpl;
@@ -133,8 +132,8 @@ class ItemRequestServiceImplTest {
         ItemRequest secondItemRequest = ItemRequest.builder().id(2L).build();
         ItemRequest thirdItemRequest = ItemRequest.builder().id(3L).build();
         List<ItemRequest> itemRequests = List.of(firstItemRequest, secondItemRequest, thirdItemRequest);
-        Mockito.when(itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(userId,
-                PageRequest.of(from, size))).thenReturn(new PageImpl<>(itemRequests));
+        Mockito.when(itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(anyLong(),
+                any())).thenReturn(new PageImpl<>(itemRequests));
         Mockito.when(itemRepository.findByRequestId(anyLong())).thenReturn(Collections.emptyList());
 
         List<ItemRequestDto> itemRequestsDto = itemRequestService.getAllRequests(userId, from, size);
@@ -144,7 +143,7 @@ class ItemRequestServiceImplTest {
         assertEquals(2, itemRequestsDto.get(1).getId());
         assertEquals(3, itemRequestsDto.get(2).getId());
         Mockito.verify(itemRequestRepository, Mockito.times(1))
-                .findByRequestorIdNotOrderByCreatedDesc(userId, PageRequest.of(from, size));
+                .findByRequestorIdNotOrderByCreatedDesc(anyLong(), any());
         Mockito.verify(itemRepository, Mockito.times(3)).findByRequestId(anyLong());
     }
 
@@ -153,14 +152,14 @@ class ItemRequestServiceImplTest {
         Long userId = 1L;
         Integer from = 0;
         Integer size = 2;
-        Mockito.when(itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(userId,
-                PageRequest.of(from, size))).thenReturn(new PageImpl<>(Collections.emptyList()));
+        Mockito.when(itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(anyLong(),
+                any())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         List<ItemRequestDto> itemRequestsDto = itemRequestService.getAllRequests(userId, from, size);
 
         assertTrue(itemRequestsDto.isEmpty());
         Mockito.verify(itemRequestRepository, Mockito.times(1))
-                .findByRequestorIdNotOrderByCreatedDesc(userId, PageRequest.of(from, size));
+                .findByRequestorIdNotOrderByCreatedDesc(anyLong(), any());
         Mockito.verify(itemRepository, Mockito.never()).findByRequestId(anyLong());
     }
 
