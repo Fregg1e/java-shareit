@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 @Transactional
 @SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:shareit",
         "spring.datasource.username=test",
@@ -21,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserServiceImplIntegrationTest {
-    private final EntityManager em;
     private final UserService userService;
 
     @Test
