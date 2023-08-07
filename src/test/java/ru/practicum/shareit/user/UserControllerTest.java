@@ -31,7 +31,6 @@ class UserControllerTest {
     private MockMvc mvc;
     @MockBean
     private UserService userService;
-
     private final UserDto userDto = UserDto.builder()
             .id(1L)
             .name("test")
