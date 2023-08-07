@@ -40,7 +40,7 @@ class ItemRequestControllerTest {
 
     @SneakyThrows
     @Test
-    void create() {
+    void createTest() {
         ItemRequestDto itemRequestDtoToCreate = ItemRequestDto.builder()
                 .description("test description")
                 .build();
@@ -59,7 +59,7 @@ class ItemRequestControllerTest {
 
     @SneakyThrows
     @Test
-    void getRequestsByUserId() {
+    void getRequestsByUserIdTest() {
         when(itemRequestService.getRequestsByUserId(anyLong())).thenReturn(List.of(itemRequestDto));
 
         mvc.perform(get("/requests")
@@ -75,7 +75,7 @@ class ItemRequestControllerTest {
 
     @SneakyThrows
     @Test
-    void getAllRequests() {
+    void getAllRequestsTest() {
         when(itemRequestService.getAllRequests(anyLong(), anyInt(), anyInt())).thenReturn(List.of(itemRequestDto));
 
         mvc.perform(get("/requests/all")
@@ -93,7 +93,7 @@ class ItemRequestControllerTest {
 
     @SneakyThrows
     @Test
-    void getRequestById() {
+    void getRequestByIdTest() {
         when(itemRequestService.getRequestById(anyLong(), anyLong())).thenReturn(itemRequestDto);
 
         mvc.perform(get("/requests/{id}", 1)
