@@ -36,7 +36,7 @@ class ItemRequestDtoTest {
         assertThat(jsonContent).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(jsonContent).extractingJsonPathStringValue("$.description").isEqualTo("1");
         assertThat(jsonContent).extractingJsonPathStringValue("$.created")
-                .isEqualTo(created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS")));
+                .isEqualTo(created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
         assertThat(jsonContent).extractingJsonPathNumberValue("$.items.[0].id").isEqualTo(1);
     }
 }

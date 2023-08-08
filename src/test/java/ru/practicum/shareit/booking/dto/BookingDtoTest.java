@@ -34,9 +34,9 @@ class BookingDtoTest {
 
         assertThat(jsonContent).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(jsonContent).extractingJsonPathStringValue("$.start")
-                .isEqualTo(start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS")));
+                .isEqualTo(start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
         assertThat(jsonContent).extractingJsonPathStringValue("$.end")
-                .isEqualTo(end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS")));
+                .isEqualTo(end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
         assertThat(jsonContent).extractingJsonPathNumberValue("$.item.id").isEqualTo(1);
         assertThat(jsonContent).extractingJsonPathNumberValue("$.booker.id").isEqualTo(1);
         assertThat(jsonContent).extractingJsonPathStringValue("$.status")
