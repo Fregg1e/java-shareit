@@ -337,8 +337,20 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void searchTest_whenTextBlank_thenReturnedEmptyList() {
+    void searchTest_whenTextEmpty_thenReturnedEmptyList() {
         String text = "";
+        Integer from = 0;
+        Integer size = 2;
+
+        List<ItemDto> itemsDto = itemService.search(text, from, size);
+
+        assertTrue(itemsDto.isEmpty());
+        Mockito.verify(itemRepository, Mockito.never()).search(any(), any());
+    }
+
+    @Test
+    void searchTest_whenTextBlank_thenReturnedEmptyList() {
+        String text = " ";
         Integer from = 0;
         Integer size = 2;
 
@@ -446,6 +458,22 @@ class ItemServiceImplTest {
         Long itemId = 1L;
         Long userId = 1L;
         User user = User.builder().id(userId).name("name").email("test@test.test").build();
+        ItemDto itemDtoToUpdate = ItemDto.builder().name(" ").build();
+        Item item = Item.builder().id(itemId).name("test2").description("test description2").owner(user).build();
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+
+        assertThrows(ValidationException.class, () -> itemService.update(itemId, userId, itemDtoToUpdate));
+        Mockito.verify(userRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void updateTest_whenItemNameEmpty_thenValidationException() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        User user = User.builder().id(userId).name("name").email("test@test.test").build();
         ItemDto itemDtoToUpdate = ItemDto.builder().name("").build();
         Item item = Item.builder().id(itemId).name("test2").description("test description2").owner(user).build();
         Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
@@ -462,7 +490,40 @@ class ItemServiceImplTest {
         Long itemId = 1L;
         Long userId = 1L;
         User user = User.builder().id(userId).name("name").email("test@test.test").build();
+        ItemDto itemDtoToUpdate = ItemDto.builder().description(" ").build();
+        Item item = Item.builder().id(itemId).name("test2").description("test description2").owner(user).build();
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+
+        assertThrows(ValidationException.class, () -> itemService.update(itemId, userId, itemDtoToUpdate));
+        Mockito.verify(userRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void updateTest_whenItemDescriptionEmpty_thenValidationException() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        User user = User.builder().id(userId).name("name").email("test@test.test").build();
         ItemDto itemDtoToUpdate = ItemDto.builder().description("").build();
+        Item item = Item.builder().id(itemId).name("test2").description("test description2").owner(user).build();
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+
+        assertThrows(ValidationException.class, () -> itemService.update(itemId, userId, itemDtoToUpdate));
+        Mockito.verify(userRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void updateTest_whenItemDescriptionLengthIsOver200_thenValidationException() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        String description = "a" + "a".repeat(205);
+        User user = User.builder().id(userId).name("name").email("test@test.test").build();
+        ItemDto itemDtoToUpdate = ItemDto.builder().description(description).build();
         Item item = Item.builder().id(itemId).name("test2").description("test description2").owner(user).build();
         Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
@@ -599,7 +660,50 @@ class ItemServiceImplTest {
     void createCommentTest_whenTextIsBlank_thenValidationException() {
         Long itemId = 1L;
         Long userId = 1L;
+        CommentDto commentDtoToCreate = CommentDto.builder().text(" ").build();
+
+        assertThrows(ValidationException.class, () -> itemService.createComment(userId, itemId, commentDtoToCreate));
+        Mockito.verify(itemRepository, Mockito.never()).findById(anyLong());
+        Mockito.verify(userRepository, Mockito.never()).findById(anyLong());
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findByBookerIdAndItemIdAndStatusAndEndIsBefore(anyLong(), anyLong(), any(), any());
+        Mockito.verify(commentRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void createCommentTest_whenTextIsNull_thenValidationException() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        CommentDto commentDtoToCreate = CommentDto.builder().build();
+
+        assertThrows(ValidationException.class, () -> itemService.createComment(userId, itemId, commentDtoToCreate));
+        Mockito.verify(itemRepository, Mockito.never()).findById(anyLong());
+        Mockito.verify(userRepository, Mockito.never()).findById(anyLong());
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findByBookerIdAndItemIdAndStatusAndEndIsBefore(anyLong(), anyLong(), any(), any());
+        Mockito.verify(commentRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void createCommentTest_whenTextIsEmpty_thenValidationException() {
+        Long itemId = 1L;
+        Long userId = 1L;
         CommentDto commentDtoToCreate = CommentDto.builder().text("").build();
+
+        assertThrows(ValidationException.class, () -> itemService.createComment(userId, itemId, commentDtoToCreate));
+        Mockito.verify(itemRepository, Mockito.never()).findById(anyLong());
+        Mockito.verify(userRepository, Mockito.never()).findById(anyLong());
+        Mockito.verify(bookingRepository, Mockito.never())
+                .findByBookerIdAndItemIdAndStatusAndEndIsBefore(anyLong(), anyLong(), any(), any());
+        Mockito.verify(commentRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void createCommentTest_whenTextLengthIsOver500_thenValidationException() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        String text = "a" + "a".repeat(505);
+        CommentDto commentDtoToCreate = CommentDto.builder().text(text).build();
 
         assertThrows(ValidationException.class, () -> itemService.createComment(userId, itemId, commentDtoToCreate));
         Mockito.verify(itemRepository, Mockito.never()).findById(anyLong());
