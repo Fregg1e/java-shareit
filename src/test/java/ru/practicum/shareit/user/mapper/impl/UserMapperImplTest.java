@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperImplTest {
     private final UserMapper userMapper = new UserMapperImpl();
+
     @Test
     void toUserDtoTest() {
         User user = User.builder().id(1L).name("test").email("test@email.test").build();

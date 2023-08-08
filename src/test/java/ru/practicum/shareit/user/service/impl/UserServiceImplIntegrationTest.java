@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.persistence.EntityManager;
-
 import java.util.ArrayList;
 import java.util.List;
 
