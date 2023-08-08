@@ -108,7 +108,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void getBookingsByUserIdTest() {
+    void getBookingsByUserIdStatusIsWaitingTest() {
         Item item = Item.builder()
                 .name("testItem")
                 .description("testItem description")
@@ -129,7 +129,91 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void getBookingsByOwnerIdTest() {
+    void getBookingsByUserIdStatusIsCurrentTest() {
+        Item item = Item.builder()
+                .name("testItem")
+                .description("testItem description")
+                .available(true)
+                .owner(users.get(0))
+                .build();
+        entityManager.persist(item);
+        LocalDateTime start = LocalDateTime.now().minusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusDays(2);
+        BookingDto bookingDtoToCreate = makeBookingDto(start,
+                end, item.getId());
+        BookingDto createdBookingDto = bookingService.create(users.get(1).getId(), bookingDtoToCreate);
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUserId(users.get(1).getId(),
+                BookingState.CURRENT, 0, 2);
+
+        assertEquals(createdBookingDto, bookingDtos.get(0));
+    }
+
+    @Test
+    void getBookingsByUserIdStatusIsPastTest() {
+        Item item = Item.builder()
+                .name("testItem")
+                .description("testItem description")
+                .available(true)
+                .owner(users.get(0))
+                .build();
+        entityManager.persist(item);
+        LocalDateTime start = LocalDateTime.now().minusDays(2);
+        LocalDateTime end = LocalDateTime.now().minusDays(1);
+        BookingDto bookingDtoToCreate = makeBookingDto(start,
+                end, item.getId());
+        BookingDto createdBookingDto = bookingService.create(users.get(1).getId(), bookingDtoToCreate);
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUserId(users.get(1).getId(),
+                BookingState.PAST, 0, 2);
+
+        assertEquals(createdBookingDto, bookingDtos.get(0));
+    }
+
+    @Test
+    void getBookingsByUserIdStatusIsFutureTest() {
+        Item item = Item.builder()
+                .name("testItem")
+                .description("testItem description")
+                .available(true)
+                .owner(users.get(0))
+                .build();
+        entityManager.persist(item);
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusDays(2);
+        BookingDto bookingDtoToCreate = makeBookingDto(start,
+                end, item.getId());
+        BookingDto createdBookingDto = bookingService.create(users.get(1).getId(), bookingDtoToCreate);
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUserId(users.get(1).getId(),
+                BookingState.FUTURE, 0, 2);
+
+        assertEquals(createdBookingDto, bookingDtos.get(0));
+    }
+
+    @Test
+    void getBookingsByUserIdStatusIsAllTest() {
+        Item item = Item.builder()
+                .name("testItem")
+                .description("testItem description")
+                .available(true)
+                .owner(users.get(0))
+                .build();
+        entityManager.persist(item);
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusDays(2);
+        BookingDto bookingDtoToCreate = makeBookingDto(start,
+                end, item.getId());
+        BookingDto createdBookingDto = bookingService.create(users.get(1).getId(), bookingDtoToCreate);
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByUserId(users.get(1).getId(),
+                null, 0, 2);
+
+        assertEquals(createdBookingDto, bookingDtos.get(0));
+    }
+
+    @Test
+    void getBookingsByOwnerIdStatusIsWaitingTest() {
         Item item = Item.builder()
                 .name("testItem")
                 .description("testItem description")
@@ -145,6 +229,90 @@ class BookingServiceImplIntegrationTest {
 
         List<BookingDto> bookingDtos = bookingService.getBookingsByOwnerId(users.get(0).getId(),
                 BookingState.WAITING, 0, 2);
+
+        assertEquals(createdBookingDto, bookingDtos.get(0));
+    }
+
+    @Test
+    void getBookingsByOwnerIdStatusIsCurrentTest() {
+        Item item = Item.builder()
+                .name("testItem")
+                .description("testItem description")
+                .available(true)
+                .owner(users.get(0))
+                .build();
+        entityManager.persist(item);
+        LocalDateTime start = LocalDateTime.now().minusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusDays(2);
+        BookingDto bookingDtoToCreate = makeBookingDto(start,
+                end, item.getId());
+        BookingDto createdBookingDto = bookingService.create(users.get(1).getId(), bookingDtoToCreate);
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByOwnerId(users.get(0).getId(),
+                BookingState.CURRENT, 0, 2);
+
+        assertEquals(createdBookingDto, bookingDtos.get(0));
+    }
+
+    @Test
+    void getBookingsByOwnerIdStatusIsPastTest() {
+        Item item = Item.builder()
+                .name("testItem")
+                .description("testItem description")
+                .available(true)
+                .owner(users.get(0))
+                .build();
+        entityManager.persist(item);
+        LocalDateTime start = LocalDateTime.now().minusDays(2);
+        LocalDateTime end = LocalDateTime.now().minusDays(1);
+        BookingDto bookingDtoToCreate = makeBookingDto(start,
+                end, item.getId());
+        BookingDto createdBookingDto = bookingService.create(users.get(1).getId(), bookingDtoToCreate);
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByOwnerId(users.get(0).getId(),
+                BookingState.PAST, 0, 2);
+
+        assertEquals(createdBookingDto, bookingDtos.get(0));
+    }
+
+    @Test
+    void getBookingsByOwnerIdStatusIsFutureTest() {
+        Item item = Item.builder()
+                .name("testItem")
+                .description("testItem description")
+                .available(true)
+                .owner(users.get(0))
+                .build();
+        entityManager.persist(item);
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusDays(2);
+        BookingDto bookingDtoToCreate = makeBookingDto(start,
+                end, item.getId());
+        BookingDto createdBookingDto = bookingService.create(users.get(1).getId(), bookingDtoToCreate);
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByOwnerId(users.get(0).getId(),
+                BookingState.FUTURE, 0, 2);
+
+        assertEquals(createdBookingDto, bookingDtos.get(0));
+    }
+
+    @Test
+    void getBookingsByOwnerIdStatusIsAllTest() {
+        Item item = Item.builder()
+                .name("testItem")
+                .description("testItem description")
+                .available(true)
+                .owner(users.get(0))
+                .build();
+        entityManager.persist(item);
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = LocalDateTime.now().plusDays(2);
+        BookingDto bookingDtoToCreate = makeBookingDto(start,
+                end, item.getId());
+        BookingDto createdBookingDto = bookingService.create(users.get(1).getId(), bookingDtoToCreate);
+
+        List<BookingDto> bookingDtos = bookingService.getBookingsByOwnerId(users.get(0).getId(),
+                null, 0, 2);
 
         assertEquals(createdBookingDto, bookingDtos.get(0));
     }
