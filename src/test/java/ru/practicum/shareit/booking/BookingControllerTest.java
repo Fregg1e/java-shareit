@@ -60,6 +60,37 @@ class BookingControllerTest {
 
     @SneakyThrows
     @Test
+    void getBookingsByUserIdWithWrongFromTest() {
+
+        mvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1)
+                        .param("state", "WAITING")
+                        .param("from", "-1")
+                        .param("size", "2")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        verify(bookingService, never()).getBookingsByUserId(anyLong(), any(), anyInt(), anyInt());
+    }
+
+    @SneakyThrows
+    @Test
+    void getBookingsByUserIdWithWrongStateTest() {
+        when(bookingService.getBookingsByUserId(anyLong(), any(), anyInt(), anyInt()))
+                .thenReturn(List.of(bookingDto));
+
+        mvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1)
+                        .param("state", "WRONG")
+                        .param("from", "0")
+                        .param("size", "2")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @SneakyThrows
+    @Test
     void getBookingByIdTest() {
         when(bookingService.getBookingById(anyLong(), anyLong()))
                 .thenReturn(bookingDto);
@@ -107,6 +138,25 @@ class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())));
+    }
+
+    @SneakyThrows
+    @Test
+    void createBookingNotValidTest() {
+        BookingDto wrongBookingDto = BookingDto.builder()
+                .id(1L)
+                .end(LocalDateTime.now().plusDays(2))
+                .status(BookingStatus.WAITING)
+                .build();
+
+        mvc.perform(post("/bookings")
+                        .content(mapper.writeValueAsString(wrongBookingDto))
+                        .header("X-Sharer-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        verify(bookingService, never()).create(anyLong(), any());
     }
 
     @SneakyThrows

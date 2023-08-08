@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.exception.model.AlreadyExistException;
+import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -70,6 +72,18 @@ class UserControllerTest {
 
     @SneakyThrows
     @Test
+    void getByIdNotFound() {
+        when(userService.getById(anyLong())).thenThrow(NotFoundException.class);
+
+        mvc.perform(get("/users/{id}", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @SneakyThrows
+    @Test
     void create() {
         UserDto userDtoToCreate = UserDto.builder()
                 .name("test")
@@ -85,6 +99,23 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+    }
+
+    @SneakyThrows
+    @Test
+    void createAlreadyExistException() {
+        UserDto userDtoToCreate = UserDto.builder()
+                .name("test")
+                .email("test@email.test")
+                .build();
+        when(userService.create(any())).thenThrow(AlreadyExistException.class);
+
+        mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(userDtoToCreate))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
     }
 
     @SneakyThrows

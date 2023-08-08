@@ -218,9 +218,9 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getBookingsByUserIdTest_whenStateIsAll_thenReturnedAllBookings() {
+    void getBookingsByUserIdTest_whenStateNull_thenReturnedAllBookings() {
         Long userId = 1L;
-        BookingState state = BookingState.ALL;
+        BookingState state = null;
         Integer from = 0;
         Integer size = 2;
         User user = User.builder().id(1L).email("test@test.test").name("test").build();
@@ -480,9 +480,9 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getBookingsByOwnerIdTest_whenStateIsAll_thenReturnedAllBookings() {
+    void getBookingsByOwnerIdTest_whenStateNull_thenReturnedAllBookings() {
         Long ownerId = 1L;
-        BookingState state = BookingState.ALL;
+        BookingState state = null;
         Integer from = 0;
         Integer size = 2;
         User user = User.builder().id(2L).email("test@test.test").name("test").build();

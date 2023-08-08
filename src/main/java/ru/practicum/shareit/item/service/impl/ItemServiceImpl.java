@@ -143,7 +143,6 @@ public class ItemServiceImpl implements ItemService {
             item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
-            ItemDtoValidator.validateAvailable(itemDto);
             item.setAvailable(itemDto.getAvailable());
         }
         log.debug("Вещь с id={} обновлена.", item.getId());

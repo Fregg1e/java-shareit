@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.comment.dto.CommentDto;
+import ru.practicum.shareit.exception.model.AccessException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -130,6 +131,17 @@ class ItemControllerTest {
 
     @SneakyThrows
     @Test
+    void createWithoutUserIdTest() {
+        mvc.perform(post("/items")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @SneakyThrows
+    @Test
     void updateTest() {
         when(itemService.update(anyLong(), anyLong(), any())).thenReturn(itemDto);
 
@@ -142,6 +154,20 @@ class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(itemDto.getDescription())));
+    }
+
+    @SneakyThrows
+    @Test
+    void updateAccessExceptionTest() {
+        when(itemService.update(anyLong(), anyLong(), any())).thenThrow(AccessException.class);
+
+        mvc.perform(patch("/items/{itemId}", 1)
+                        .content(mapper.writeValueAsString(itemDto))
+                        .header("X-Sharer-User-Id", 1)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @SneakyThrows

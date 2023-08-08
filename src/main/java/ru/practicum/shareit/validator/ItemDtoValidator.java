@@ -20,13 +20,6 @@ public class ItemDtoValidator {
         }
     }
 
-    public static void validateAvailable(ItemDto itemDto) {
-        Boolean available = itemDto.getAvailable();
-        if (available == null) {
-            throw new ValidationException("Произошло исключение! Доступность равняется null.");
-        }
-    }
-
     public static void validateAllFieldNotNull(ItemDto itemDto) {
         if (itemDto.getName() == null
                 && itemDto.getDescription() == null

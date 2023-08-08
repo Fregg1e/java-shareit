@@ -204,40 +204,135 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void getItemsByUserId_whenFromIs0AndSizeIs2_thenListSize1() {
+    void getItemsByUserId_whenFromIs0AndSizeIs2_thenListSize2() {
         Long userId = 1L;
         Integer from = 0;
         Integer size = 2;
         User user = User.builder().id(userId).name("name").email("test@test.test").build();
-        User firstLastBooker = User.builder().id(2L).name("lastBooker").email("lastbooker@test.test").build();
-        User firstNextBooker = User.builder().id(3L).name("nextBooker").email("nextbooker@test.test").build();
+        User lastBooker = User.builder().id(2L).name("lastBooker").email("lastbooker@test.test").build();
+        User nextBooker = User.builder().id(3L).name("nextBooker").email("nextbooker@test.test").build();
+        User lastBooker2 = User.builder().id(2L).name("lastBooker2").email("lastbooker2@test.test").build();
+        User nextBooker2 = User.builder().id(3L).name("nextBooker2").email("nextbooker2@test.test").build();
         Item item = Item.builder().id(1L).name("testItem").description("test description")
                 .owner(user).build();
-        List<Item> items = List.of(item);
+        Item item2 = Item.builder().id(1L).name("testItem2").description("test description2")
+                .owner(user).build();
+        List<Item> items = List.of(item, item2);
         Booking lastBooking = Booking.builder().id(1L).item(item).status(BookingStatus.APPROVED)
-                .booker(firstLastBooker).build();
+                .booker(lastBooker).build();
         Booking nextBooking = Booking.builder().id(2L).item(item).status(BookingStatus.APPROVED)
-                .booker(firstNextBooker).build();
+                .booker(nextBooker).start(LocalDateTime.now().plusMinutes(30)).build();
+        Booking lastBooking2 = Booking.builder().id(3L).item(item2).status(BookingStatus.APPROVED)
+                .booker(lastBooker2).build();
+        Booking nextBooking2 = Booking.builder().id(4L).item(item2).status(BookingStatus.APPROVED)
+                .booker(nextBooker2).start(LocalDateTime.now().plusMinutes(40)).build();
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(new PageImpl<>(items));
         Mockito.when(bookingRepository
                         .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any()))
-                .thenReturn(lastBooking);
+                .thenReturn(lastBooking).thenReturn(lastBooking2);
         Mockito.when(bookingRepository
                         .findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(anyLong(), any(), any()))
-                .thenReturn(nextBooking);
+                .thenReturn(nextBooking).thenReturn(nextBooking2);
 
         List<ItemDto> itemsDto = itemService.getItemsByUserId(userId, from, size);
 
         assertFalse(itemsDto.isEmpty());
-        assertEquals(1, itemsDto.size());
+        assertEquals(2, itemsDto.size());
         assertEquals(item.getId(), itemsDto.get(0).getId());
         assertEquals(lastBooking.getId(), itemsDto.get(0).getLastBooking().getId());
         assertEquals(nextBooking.getId(), itemsDto.get(0).getNextBooking().getId());
         Mockito.verify(itemRepository, Mockito.times(1)).findByOwnerId(anyLong(), any());
-        Mockito.verify(bookingRepository, Mockito.times(1))
+        Mockito.verify(bookingRepository, Mockito.times(2))
                 .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any());
-        Mockito.verify(bookingRepository, Mockito.times(1))
+        Mockito.verify(bookingRepository, Mockito.times(2))
+                .findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(anyLong(), any(), any());
+    }
+
+    @Test
+    void getItemsByUserId_whenItem2NextBookingNull_thenListSize2() {
+        Long userId = 1L;
+        Integer from = 0;
+        Integer size = 2;
+        User user = User.builder().id(userId).name("name").email("test@test.test").build();
+        User lastBooker = User.builder().id(2L).name("lastBooker").email("lastbooker@test.test").build();
+        User nextBooker = User.builder().id(3L).name("nextBooker").email("nextbooker@test.test").build();
+        User lastBooker2 = User.builder().id(2L).name("lastBooker2").email("lastbooker2@test.test").build();
+        Item item = Item.builder().id(1L).name("testItem").description("test description")
+                .owner(user).build();
+        Item item2 = Item.builder().id(1L).name("testItem2").description("test description2")
+                .owner(user).build();
+        List<Item> items = List.of(item, item2);
+        Booking lastBooking = Booking.builder().id(1L).item(item).status(BookingStatus.APPROVED)
+                .booker(lastBooker).build();
+        Booking nextBooking = Booking.builder().id(2L).item(item).status(BookingStatus.APPROVED)
+                .booker(nextBooker).start(LocalDateTime.now().plusMinutes(30)).build();
+        Booking lastBooking2 = Booking.builder().id(3L).item(item2).status(BookingStatus.APPROVED)
+                .booker(lastBooker2).build();
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(new PageImpl<>(items));
+        Mockito.when(bookingRepository
+                        .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any()))
+                .thenReturn(lastBooking).thenReturn(lastBooking2);
+        Mockito.when(bookingRepository
+                        .findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(anyLong(), any(), any()))
+                .thenReturn(nextBooking).thenReturn(null);
+
+        List<ItemDto> itemsDto = itemService.getItemsByUserId(userId, from, size);
+
+        assertFalse(itemsDto.isEmpty());
+        assertEquals(2, itemsDto.size());
+        assertEquals(item.getId(), itemsDto.get(0).getId());
+        assertEquals(lastBooking.getId(), itemsDto.get(0).getLastBooking().getId());
+        assertEquals(nextBooking.getId(), itemsDto.get(0).getNextBooking().getId());
+        Mockito.verify(itemRepository, Mockito.times(1)).findByOwnerId(anyLong(), any());
+        Mockito.verify(bookingRepository, Mockito.times(2))
+                .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any());
+        Mockito.verify(bookingRepository, Mockito.times(2))
+                .findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(anyLong(), any(), any());
+    }
+
+    @Test
+    void getItemsByUserId_whenItemNextBookingNull_thenListSize2() {
+        Long userId = 1L;
+        Integer from = 0;
+        Integer size = 2;
+        User user = User.builder().id(userId).name("name").email("test@test.test").build();
+        User lastBooker = User.builder().id(2L).name("lastBooker").email("lastbooker@test.test").build();
+        User nextBooker = User.builder().id(3L).name("nextBooker").email("nextbooker@test.test").build();
+        User lastBooker2 = User.builder().id(2L).name("lastBooker2").email("lastbooker2@test.test").build();
+        User nextBooker2 = User.builder().id(3L).name("nextBooker2").email("nextbooker2@test.test").build();
+        Item item = Item.builder().id(1L).name("testItem").description("test description")
+                .owner(user).build();
+        Item item2 = Item.builder().id(1L).name("testItem2").description("test description2")
+                .owner(user).build();
+        List<Item> items = List.of(item, item2);
+        Booking lastBooking = Booking.builder().id(1L).item(item).status(BookingStatus.APPROVED)
+                .booker(lastBooker).build();
+        Booking lastBooking2 = Booking.builder().id(3L).item(item2).status(BookingStatus.APPROVED)
+                .booker(lastBooker2).build();
+        Booking nextBooking2 = Booking.builder().id(4L).item(item2).status(BookingStatus.APPROVED)
+                .booker(nextBooker2).start(LocalDateTime.now().plusMinutes(40)).build();
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(new PageImpl<>(items));
+        Mockito.when(bookingRepository
+                        .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any()))
+                .thenReturn(lastBooking).thenReturn(lastBooking2);
+        Mockito.when(bookingRepository
+                        .findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(anyLong(), any(), any()))
+                .thenReturn(null).thenReturn(nextBooking2);
+
+        List<ItemDto> itemsDto = itemService.getItemsByUserId(userId, from, size);
+
+        assertFalse(itemsDto.isEmpty());
+        assertEquals(2, itemsDto.size());
+        assertEquals(item2.getId(), itemsDto.get(0).getId());
+        assertEquals(lastBooking2.getId(), itemsDto.get(0).getLastBooking().getId());
+        assertEquals(nextBooking2.getId(), itemsDto.get(0).getNextBooking().getId());
+        Mockito.verify(itemRepository, Mockito.times(1)).findByOwnerId(anyLong(), any());
+        Mockito.verify(bookingRepository, Mockito.times(2))
+                .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any());
+        Mockito.verify(bookingRepository, Mockito.times(2))
                 .findFirstByItemIdAndStatusAndStartIsAfterOrderByStartAsc(anyLong(), any(), any());
     }
 
@@ -347,6 +442,38 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void updateTest_whenItemNameBlank_thenValidationException() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        User user = User.builder().id(userId).name("name").email("test@test.test").build();
+        ItemDto itemDtoToUpdate = ItemDto.builder().name("").build();
+        Item item = Item.builder().id(itemId).name("test2").description("test description2").owner(user).build();
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+
+        assertThrows(ValidationException.class, () -> itemService.update(itemId, userId, itemDtoToUpdate));
+        Mockito.verify(userRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    void updateTest_whenItemDescriptionBlank_thenValidationException() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        User user = User.builder().id(userId).name("name").email("test@test.test").build();
+        ItemDto itemDtoToUpdate = ItemDto.builder().description("").build();
+        Item item = Item.builder().id(itemId).name("test2").description("test description2").owner(user).build();
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+
+        assertThrows(ValidationException.class, () -> itemService.update(itemId, userId, itemDtoToUpdate));
+        Mockito.verify(userRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.never()).save(any());
+    }
+
+    @Test
     void updateTest_whenUserNotExist_thenNotFoundException() {
         Long itemId = 1L;
         Long userId = 1L;
@@ -406,6 +533,28 @@ class ItemServiceImplTest {
 
         assertEquals(itemDtoToUpdate.getName(), itemDtoUpdated.getName());
         assertEquals(itemDtoToUpdate.getDescription(), itemDtoUpdated.getDescription());
+        Mockito.verify(userRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1)).findById(anyLong());
+        Mockito.verify(itemRepository, Mockito.times(1)).save(any());
+    }
+
+    @Test
+    void updateTest_whenStatusUpdate_thenUpdatedItemDto() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        User user = User.builder().id(userId).name("name").email("test@test.test").build();
+        ItemDto itemDtoToUpdate = ItemDto.builder().name("test2").description("test description2")
+                .available(false).build();
+        Item item = Item.builder().id(itemId).name("test2").description("test description2").available(false)
+                .owner(user).build();
+        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
+        Mockito.when(itemRepository.save(any())).thenReturn(item);
+
+        ItemDto itemDtoUpdated = itemService.update(itemId, userId, itemDtoToUpdate);
+
+        assertEquals(itemDtoToUpdate.getName(), itemDtoUpdated.getName());
+        assertEquals(itemDtoToUpdate.getAvailable(), itemDtoUpdated.getAvailable());
         Mockito.verify(userRepository, Mockito.times(1)).findById(anyLong());
         Mockito.verify(itemRepository, Mockito.times(1)).findById(anyLong());
         Mockito.verify(itemRepository, Mockito.times(1)).save(any());
