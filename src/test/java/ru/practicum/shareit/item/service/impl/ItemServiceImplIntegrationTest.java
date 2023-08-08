@@ -13,6 +13,7 @@ import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.EntityManager;
@@ -48,7 +49,11 @@ class ItemServiceImplIntegrationTest {
 
     @Test
     void createTest() {
+        ItemRequest request = ItemRequest.builder().description("1").requestor(users.get(0))
+                        .created(LocalDateTime.now()).build();
+        entityManager.persist(request);
         ItemDto itemDtoToCreate = makeItemDto("item1", "item1 description", true);
+        itemDtoToCreate.setRequestId(request.getId());
 
         ItemDto itemDto = itemService.create(users.get(0).getId(), itemDtoToCreate);
 
@@ -78,6 +83,23 @@ class ItemServiceImplIntegrationTest {
     void getItemByIdTest() {
         ItemDto itemDtoToCreate = makeItemDto("item1", "item1 description", true);
         ItemDto createdItemDto = itemService.create(users.get(0).getId(), itemDtoToCreate);
+        Booking lastBooking = Booking.builder()
+                .start(LocalDateTime.now().minusDays(2))
+                .end(LocalDateTime.now().minusDays(1))
+                .item(itemMapper.toItem(createdItemDto, users.get(0)))
+                .booker(users.get(1))
+                .status(BookingStatus.APPROVED).build();
+        entityManager.persist(lastBooking);
+        Booking nextBooking = Booking.builder()
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .item(itemMapper.toItem(createdItemDto, users.get(0)))
+                .booker(users.get(1))
+                .status(BookingStatus.APPROVED).build();
+        entityManager.persist(nextBooking);
+        CommentDto commentDtoToCreate = CommentDto.builder().text("test comment").build();
+        CommentDto commentDto = itemService.createComment(users.get(1).getId(), createdItemDto.getId(),
+                commentDtoToCreate);
 
         ItemDto itemDto = itemService.getItemById(users.get(0).getId(), createdItemDto.getId());
 
@@ -86,6 +108,10 @@ class ItemServiceImplIntegrationTest {
         assertEquals(createdItemDto.getName(), itemDto.getName());
         assertEquals(createdItemDto.getDescription(), itemDto.getDescription());
         assertEquals(createdItemDto.getAvailable(), itemDto.getAvailable());
+        assertNotNull(itemDto.getLastBooking());
+        assertNotNull(itemDto.getNextBooking());
+        assertFalse(itemDto.getComments().isEmpty());
+        assertEquals(commentDto, itemDto.getComments().get(0));
     }
 
     @Test
@@ -115,12 +141,48 @@ class ItemServiceImplIntegrationTest {
     void getItemsByUserIdTest() {
         ItemDto itemDtoToCreate = makeItemDto("item1", "item1 description", true);
         ItemDto createdItemDto = itemService.create(users.get(0).getId(), itemDtoToCreate);
+        Booking lastBooking = Booking.builder()
+                .start(LocalDateTime.now().minusDays(2))
+                .end(LocalDateTime.now().minusDays(1))
+                .item(itemMapper.toItem(createdItemDto, users.get(0)))
+                .booker(users.get(1))
+                .status(BookingStatus.APPROVED).build();
+        entityManager.persist(lastBooking);
+        Booking nextBooking = Booking.builder()
+                .start(LocalDateTime.now().plusDays(1))
+                .end(LocalDateTime.now().plusDays(2))
+                .item(itemMapper.toItem(createdItemDto, users.get(0)))
+                .booker(users.get(1))
+                .status(BookingStatus.APPROVED).build();
+        entityManager.persist(nextBooking);
+
+        ItemDto itemDtoToCreate2 = makeItemDto("item2", "item2 description", true);
+        ItemDto createdItemDto2 = itemService.create(users.get(0).getId(), itemDtoToCreate2);
+        Booking lastBooking2 = Booking.builder()
+                .start(LocalDateTime.now().minusDays(2))
+                .end(LocalDateTime.now().minusDays(1))
+                .item(itemMapper.toItem(createdItemDto2, users.get(0)))
+                .booker(users.get(1))
+                .status(BookingStatus.APPROVED).build();
+        entityManager.persist(lastBooking2);
+        Booking nextBooking2 = Booking.builder()
+                .start(LocalDateTime.now().plusDays(2))
+                .end(LocalDateTime.now().plusDays(3))
+                .item(itemMapper.toItem(createdItemDto2, users.get(0)))
+                .booker(users.get(1))
+                .status(BookingStatus.APPROVED).build();
+        entityManager.persist(nextBooking2);
 
         List<ItemDto> itemDtos = itemService.getItemsByUserId(users.get(0).getId(), 0, 2);
 
         assertFalse(itemDtos.isEmpty());
-        assertEquals(1, itemDtos.size());
+        assertEquals(2, itemDtos.size());
         assertEquals(createdItemDto.getId(), itemDtos.get(0).getId());
+        assertNotNull(itemDtos.get(0).getLastBooking());
+        assertNotNull(itemDtos.get(0).getNextBooking());
+        assertEquals(createdItemDto2.getId(), itemDtos.get(1).getId());
+        assertNotNull(itemDtos.get(1).getLastBooking());
+        assertNotNull(itemDtos.get(1).getNextBooking());
     }
 
     @Test
