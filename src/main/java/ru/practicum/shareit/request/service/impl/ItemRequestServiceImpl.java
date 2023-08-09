@@ -59,9 +59,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     public List<ItemRequestDto> getAllRequests(Long userId, Integer from, Integer size) {
         List<ItemRequestDto> requests = itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(userId,
-                        new OffsetPageRequest(from, size))
+                        new OffsetPageRequest(from, size)).stream()
                 .map(itemRequestMapper::toItemRequestDto)
-                .getContent();
+                .collect(Collectors.toList());
         for (ItemRequestDto requestDto : requests) {
             setItemForRequestDto(requestDto);
         }

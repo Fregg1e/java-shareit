@@ -76,9 +76,9 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", userId)));
-        List<ItemDto> itemDtos = itemRepository.findByOwnerId(user.getId(), new OffsetPageRequest(from, size))
+        List<ItemDto> itemDtos = itemRepository.findByOwnerId(user.getId(), new OffsetPageRequest(from, size)).stream()
                 .map(itemMapper::toItemDto)
-                .getContent();
+                .collect(Collectors.toList());
         for (ItemDto itemDto : itemDtos) {
             setLastAndNextBooking(itemDto);
         }
@@ -100,9 +100,9 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty() || text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.search(text, new OffsetPageRequest(from, size))
+        return itemRepository.search(text, new OffsetPageRequest(from, size)).stream()
                 .map(itemMapper::toItemDto)
-                .getContent();
+                .collect(Collectors.toList());
     }
 
     @Override

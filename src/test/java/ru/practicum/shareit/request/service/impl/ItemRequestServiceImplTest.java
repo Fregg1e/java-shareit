@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
 import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.mapper.impl.ItemMapperImpl;
@@ -133,7 +132,7 @@ class ItemRequestServiceImplTest {
         ItemRequest thirdItemRequest = ItemRequest.builder().id(3L).build();
         List<ItemRequest> itemRequests = List.of(firstItemRequest, secondItemRequest, thirdItemRequest);
         Mockito.when(itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(anyLong(),
-                any())).thenReturn(new PageImpl<>(itemRequests));
+                any())).thenReturn(itemRequests);
         Mockito.when(itemRepository.findByRequestId(anyLong())).thenReturn(Collections.emptyList());
 
         List<ItemRequestDto> itemRequestsDto = itemRequestService.getAllRequests(userId, from, size);
@@ -153,7 +152,7 @@ class ItemRequestServiceImplTest {
         Integer from = 0;
         Integer size = 2;
         Mockito.when(itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(anyLong(),
-                any())).thenReturn(new PageImpl<>(Collections.emptyList()));
+                any())).thenReturn(Collections.emptyList());
 
         List<ItemRequestDto> itemRequestsDto = itemRequestService.getAllRequests(userId, from, size);
 

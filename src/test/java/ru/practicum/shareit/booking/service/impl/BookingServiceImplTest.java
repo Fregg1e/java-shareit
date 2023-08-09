@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.mapper.impl.BookingMapperImpl;
@@ -75,7 +74,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(user));
         Mockito.when(bookingRepository
                 .findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(anyLong(), any(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByUserId(userId, state, from, size);
 
@@ -106,7 +105,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(user));
         Mockito.when(bookingRepository
                         .findByBookerIdAndEndIsBeforeOrderByStartDesc(anyLong(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByUserId(userId, state, from, size);
 
@@ -137,7 +136,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(user));
         Mockito.when(bookingRepository
                         .findByBookerIdAndStartIsAfterOrderByStartDesc(anyLong(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByUserId(userId, state, from, size);
 
@@ -168,7 +167,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(user));
         Mockito.when(bookingRepository
                         .findByBookerIdAndStatusOrderByStartDesc(anyLong(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByUserId(userId, state, from, size);
 
@@ -199,7 +198,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(user));
         Mockito.when(bookingRepository
                         .findByBookerIdAndStatusOrderByStartDesc(anyLong(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByUserId(userId, state, from, size);
 
@@ -230,7 +229,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(user));
         Mockito.when(bookingRepository
                         .findByBookerIdOrderByStartDesc(anyLong(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByUserId(userId, state, from, size);
 
@@ -333,7 +332,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(owner));
         Mockito.when(bookingRepository
                         .findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(anyLong(), any(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByOwnerId(ownerId, state, from, size);
 
@@ -365,7 +364,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(owner));
         Mockito.when(bookingRepository
                         .findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(anyLong(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByOwnerId(ownerId, state, from, size);
 
@@ -397,7 +396,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(owner));
         Mockito.when(bookingRepository
                         .findByItemOwnerIdAndStartIsAfterOrderByStartDesc(anyLong(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByOwnerId(ownerId, state, from, size);
 
@@ -429,7 +428,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(owner));
         Mockito.when(bookingRepository
                         .findByItemOwnerIdAndStatusOrderByStartDesc(anyLong(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByOwnerId(ownerId, state, from, size);
 
@@ -461,7 +460,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(owner));
         Mockito.when(bookingRepository
                         .findByItemOwnerIdAndStatusOrderByStartDesc(anyLong(), any(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByOwnerId(ownerId, state, from, size);
 
@@ -493,7 +492,7 @@ class BookingServiceImplTest {
         Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(owner));
         Mockito.when(bookingRepository
                         .findByItemOwnerIdOrderByStartDesc(anyLong(), any()))
-                .thenReturn(new PageImpl<>(bookings));
+                .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = bookingService.getBookingsByOwnerId(ownerId, state, from, size);
 

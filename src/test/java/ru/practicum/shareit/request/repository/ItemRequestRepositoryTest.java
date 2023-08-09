@@ -57,7 +57,7 @@ class ItemRequestRepositoryTest {
     @Test
     void findByRequestorIdNotOrderByCreatedDescTest() {
         List<ItemRequest> itemRequests = repository.findByRequestorIdNotOrderByCreatedDesc(users.get(0).getId(),
-                PageRequest.of(0, 3)).getContent();
+                PageRequest.of(0, 3));
 
         assertEquals(2, itemRequests.size());
         assertEquals(requests.get(2), itemRequests.get(0));

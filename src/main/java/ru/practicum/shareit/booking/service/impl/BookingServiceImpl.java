@@ -20,6 +20,7 @@ import ru.practicum.shareit.utils.OffsetPageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,34 +42,34 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case CURRENT:
                 return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), LocalDateTime.now(), new OffsetPageRequest(from, size))
+                                LocalDateTime.now(), LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), new OffsetPageRequest(from, size))
+                                LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             case FUTURE:
                 return bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), new OffsetPageRequest(from, size))
+                                LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             case WAITING:
                 return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(user.getId(),
-                                BookingStatus.WAITING, new OffsetPageRequest(from, size))
+                                BookingStatus.WAITING, new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             case REJECTED:
                 return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(user.getId(),
-                                BookingStatus.REJECTED, new OffsetPageRequest(from, size))
+                                BookingStatus.REJECTED, new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             default:
                 return bookingRepository.findByBookerIdOrderByStartDesc(user.getId(),
-                                new OffsetPageRequest(from, size))
+                                new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
         }
     }
 
@@ -98,34 +99,34 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case CURRENT:
                 return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), LocalDateTime.now(), new OffsetPageRequest(from, size))
+                                LocalDateTime.now(), LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), new OffsetPageRequest(from, size))
+                                LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             case FUTURE:
                 return bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(user.getId(),
-                                LocalDateTime.now(), new OffsetPageRequest(from, size))
+                                LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             case WAITING:
                 return bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(user.getId(),
-                                BookingStatus.WAITING, new OffsetPageRequest(from, size))
+                                BookingStatus.WAITING, new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             case REJECTED:
                 return bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(user.getId(),
-                                BookingStatus.REJECTED, new OffsetPageRequest(from, size))
+                                BookingStatus.REJECTED, new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
             default:
                 return bookingRepository.findByItemOwnerIdOrderByStartDesc(user.getId(),
-                                new OffsetPageRequest(from, size))
+                                new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
-                        .getContent();
+                        .collect(Collectors.toList());
         }
     }
 

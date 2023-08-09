@@ -190,7 +190,7 @@ class ItemServiceImplTest {
         Integer size = 2;
         User user = User.builder().id(3L).name("name").email("test@test.test").build();
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(Page.empty());
+        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(Collections.emptyList());
 
         List<ItemDto> itemsDto = itemService.getItemsByUserId(userId, from, size);
 
@@ -227,7 +227,7 @@ class ItemServiceImplTest {
         Booking nextBooking2 = Booking.builder().id(4L).item(item2).status(BookingStatus.APPROVED)
                 .booker(nextBooker2).start(LocalDateTime.now().plusMinutes(40)).build();
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(new PageImpl<>(items));
+        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(items);
         Mockito.when(bookingRepository
                         .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any()))
                 .thenReturn(lastBooking).thenReturn(lastBooking2);
@@ -270,7 +270,7 @@ class ItemServiceImplTest {
         Booking lastBooking2 = Booking.builder().id(3L).item(item2).status(BookingStatus.APPROVED)
                 .booker(lastBooker2).build();
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(new PageImpl<>(items));
+        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(items);
         Mockito.when(bookingRepository
                         .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any()))
                 .thenReturn(lastBooking).thenReturn(lastBooking2);
@@ -314,7 +314,7 @@ class ItemServiceImplTest {
         Booking nextBooking2 = Booking.builder().id(4L).item(item2).status(BookingStatus.APPROVED)
                 .booker(nextBooker2).start(LocalDateTime.now().plusMinutes(40)).build();
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(new PageImpl<>(items));
+        Mockito.when(itemRepository.findByOwnerId(anyLong(), any())).thenReturn(items);
         Mockito.when(bookingRepository
                         .findFirstByItemIdAndStatusAndStartIsBeforeOrderByEndDesc(anyLong(), any(), any()))
                 .thenReturn(lastBooking).thenReturn(lastBooking2);
@@ -365,7 +365,7 @@ class ItemServiceImplTest {
         String text = "text";
         Integer from = 0;
         Integer size = 2;
-        Mockito.when(itemRepository.search(any(), any())).thenReturn(Page.empty());
+        Mockito.when(itemRepository.search(any(), any())).thenReturn(Collections.emptyList());
 
         List<ItemDto> itemsDto = itemService.search(text, from, size);
 
@@ -382,7 +382,7 @@ class ItemServiceImplTest {
         Item item = Item.builder().id(1L).name("testItem").description("test description")
                 .owner(user).build();
         List<Item> items = List.of(item);
-        Mockito.when(itemRepository.search(any(), any())).thenReturn(new PageImpl<>(items));
+        Mockito.when(itemRepository.search(any(), any())).thenReturn(items);
 
         List<ItemDto> itemsDto = itemService.search(text, from, size);
 

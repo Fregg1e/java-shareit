@@ -59,7 +59,7 @@ class ItemRepositoryTest {
     @Test
     void findByOwnerIdTest() {
         List<Item> itemByOwner = repository.findByOwnerId(users.get(1).getId(),
-                PageRequest.of(0, 3)).getContent();
+                PageRequest.of(0, 3));
 
         assertEquals(2, itemByOwner.size());
         assertEquals(items.get(1), itemByOwner.get(0));
@@ -69,7 +69,7 @@ class ItemRepositoryTest {
     @Test
     void searchTest() {
         List<Item> itemBySearch = repository.search("2",
-                PageRequest.of(0, 3)).getContent();
+                PageRequest.of(0, 3));
 
         assertEquals(2, itemBySearch.size());
         assertEquals(items.get(1), itemBySearch.get(0));

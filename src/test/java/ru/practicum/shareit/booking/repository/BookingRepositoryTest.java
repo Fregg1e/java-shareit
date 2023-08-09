@@ -60,7 +60,7 @@ class BookingRepositoryTest {
         }
 
         List<Booking> bookingsByBookerId = repository.findByBookerIdOrderByStartDesc(users.get(2).getId(),
-                PageRequest.of(0, 3)).getContent();
+                PageRequest.of(0, 3));
 
         assertEquals(2, bookingsByBookerId.size());
         assertEquals(bookings.get(1), bookingsByBookerId.get(0));
@@ -82,7 +82,7 @@ class BookingRepositoryTest {
         }
 
         List<Booking> bookingsByOwnerId = repository.findByItemOwnerIdOrderByStartDesc(users.get(0).getId(),
-                PageRequest.of(0, 3)).getContent();
+                PageRequest.of(0, 3));
 
         assertEquals(2, bookingsByOwnerId.size());
         assertEquals(bookings.get(2), bookingsByOwnerId.get(0));
@@ -105,7 +105,7 @@ class BookingRepositoryTest {
 
         List<Booking> bookingsResponse = repository
                 .findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(users.get(2).getId(),
-                        LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(0, 3)).getContent();
+                        LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(0, 3));
 
         assertEquals(1, bookingsResponse.size());
         assertEquals(bookings.get(0), bookingsResponse.get(0));
@@ -127,7 +127,7 @@ class BookingRepositoryTest {
 
         List<Booking> bookingsResponse = repository
                 .findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(users.get(0).getId(),
-                        LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(0, 3)).getContent();
+                        LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(0, 3));
 
         assertEquals(2, bookingsResponse.size());
         assertEquals(bookings.get(0), bookingsResponse.get(0));
@@ -150,7 +150,7 @@ class BookingRepositoryTest {
 
         List<Booking> bookingsResponse = repository
                 .findByBookerIdAndEndIsBeforeOrderByStartDesc(users.get(2).getId(),
-                        LocalDateTime.now(), PageRequest.of(0, 3)).getContent();
+                        LocalDateTime.now(), PageRequest.of(0, 3));
 
         assertEquals(1, bookingsResponse.size());
         assertEquals(bookings.get(0), bookingsResponse.get(0));
@@ -172,7 +172,7 @@ class BookingRepositoryTest {
 
         List<Booking> bookingsResponse = repository
                 .findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(users.get(0).getId(),
-                        LocalDateTime.now(), PageRequest.of(0, 3)).getContent();
+                        LocalDateTime.now(), PageRequest.of(0, 3));
 
         assertEquals(1, bookingsResponse.size());
         assertEquals(bookings.get(0), bookingsResponse.get(0));
@@ -194,7 +194,7 @@ class BookingRepositoryTest {
 
         List<Booking> bookingsResponse = repository
                 .findByBookerIdAndStartIsAfterOrderByStartDesc(users.get(2).getId(),
-                        LocalDateTime.now(), PageRequest.of(0, 3)).getContent();
+                        LocalDateTime.now(), PageRequest.of(0, 3));
 
         assertEquals(1, bookingsResponse.size());
         assertEquals(bookings.get(1), bookingsResponse.get(0));
@@ -216,7 +216,7 @@ class BookingRepositoryTest {
 
         List<Booking> bookingsResponse = repository
                 .findByItemOwnerIdAndStartIsAfterOrderByStartDesc(users.get(0).getId(),
-                        LocalDateTime.now(), PageRequest.of(0, 3)).getContent();
+                        LocalDateTime.now(), PageRequest.of(0, 3));
 
         assertEquals(1, bookingsResponse.size());
         assertEquals(bookings.get(0), bookingsResponse.get(0));
@@ -238,7 +238,7 @@ class BookingRepositoryTest {
 
         List<Booking> bookingsResponse = repository
                 .findByBookerIdAndStatusOrderByStartDesc(users.get(2).getId(),
-                        BookingStatus.REJECTED, PageRequest.of(0, 3)).getContent();
+                        BookingStatus.REJECTED, PageRequest.of(0, 3));
 
         assertEquals(1, bookingsResponse.size());
         assertEquals(bookings.get(0), bookingsResponse.get(0));
@@ -260,7 +260,7 @@ class BookingRepositoryTest {
 
         List<Booking> bookingsResponse = repository
                 .findByItemOwnerIdAndStatusOrderByStartDesc(users.get(0).getId(),
-                        BookingStatus.REJECTED, PageRequest.of(0, 3)).getContent();
+                        BookingStatus.REJECTED, PageRequest.of(0, 3));
 
         assertEquals(1, bookingsResponse.size());
         assertEquals(bookings.get(0), bookingsResponse.get(0));
