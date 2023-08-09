@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingState;
@@ -21,10 +22,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:shareit",
-        "spring.datasource.username=test",
-        "spring.datasource.password=test"},
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
+@ActiveProfiles("integrationtest")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class BookingServiceImplIntegrationTest {
     private final EntityManager entityManager;
