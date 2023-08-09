@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -10,6 +9,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -20,9 +20,8 @@ class BookingDtoTest {
     @Autowired
     private JacksonTester<BookingDto> jacksonTester;
 
-    @SneakyThrows
     @Test
-    void testBookingDto() {
+    void testBookingDto() throws IOException {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.now().plusDays(1);
         ItemDto itemDto = ItemDto.builder().id(1L).name("1").description("1").available(true).requestId(1L).build();

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,9 +37,8 @@ class ItemRequestControllerTest {
             .created(LocalDateTime.now())
             .build();
 
-    @SneakyThrows
     @Test
-    void createTest() {
+    void createTest() throws Exception {
         ItemRequestDto itemRequestDtoToCreate = ItemRequestDto.builder()
                 .description("test description")
                 .build();
@@ -57,9 +55,8 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void getRequestsByUserIdTest() {
+    void getRequestsByUserIdTest() throws Exception {
         when(itemRequestService.getRequestsByUserId(anyLong())).thenReturn(List.of(itemRequestDto));
 
         mvc.perform(get("/requests")
@@ -73,9 +70,8 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$[0].description", is(itemRequestDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void getAllRequestsTest() {
+    void getAllRequestsTest() throws Exception {
         when(itemRequestService.getAllRequests(anyLong(), anyInt(), anyInt())).thenReturn(List.of(itemRequestDto));
 
         mvc.perform(get("/requests/all")
@@ -91,9 +87,8 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$[0].description", is(itemRequestDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void getRequestByIdTest() {
+    void getRequestByIdTest() throws Exception {
         when(itemRequestService.getRequestById(anyLong(), anyLong())).thenReturn(itemRequestDto);
 
         mvc.perform(get("/requests/{id}", 1)

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,9 +38,8 @@ class BookingControllerTest {
             .status(BookingStatus.WAITING)
             .build();
 
-    @SneakyThrows
     @Test
-    void getBookingsByUserIdTest() {
+    void getBookingsByUserIdTest() throws Exception {
         when(bookingService.getBookingsByUserId(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
@@ -58,9 +56,8 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[0].status", is(bookingDto.getStatus().toString())));
     }
 
-    @SneakyThrows
     @Test
-    void getBookingsByUserIdWithWrongFromTest() {
+    void getBookingsByUserIdWithWrongFromTest() throws Exception {
 
         mvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", 1)
@@ -73,9 +70,8 @@ class BookingControllerTest {
         verify(bookingService, never()).getBookingsByUserId(anyLong(), any(), anyInt(), anyInt());
     }
 
-    @SneakyThrows
     @Test
-    void getBookingsByUserIdWithWrongStateTest() {
+    void getBookingsByUserIdWithWrongStateTest() throws Exception {
         when(bookingService.getBookingsByUserId(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
@@ -89,9 +85,8 @@ class BookingControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @SneakyThrows
     @Test
-    void getBookingByIdTest() {
+    void getBookingByIdTest() throws Exception {
         when(bookingService.getBookingById(anyLong(), anyLong()))
                 .thenReturn(bookingDto);
 
@@ -104,9 +99,8 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())));
     }
 
-    @SneakyThrows
     @Test
-    void getBookingsByOwnerIdTest() {
+    void getBookingsByOwnerIdTest() throws Exception {
         when(bookingService.getBookingsByOwnerId(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
@@ -123,9 +117,8 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[0].status", is(bookingDto.getStatus().toString())));
     }
 
-    @SneakyThrows
     @Test
-    void createTest() {
+    void createTest() throws Exception {
         when(bookingService.create(anyLong(), any()))
                 .thenReturn(bookingDto);
 
@@ -140,9 +133,8 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())));
     }
 
-    @SneakyThrows
     @Test
-    void createBookingNotValidTest() {
+    void createBookingNotValidTest() throws Exception {
         BookingDto wrongBookingDto = BookingDto.builder()
                 .id(1L)
                 .end(LocalDateTime.now().plusDays(2))
@@ -159,9 +151,8 @@ class BookingControllerTest {
         verify(bookingService, never()).create(anyLong(), any());
     }
 
-    @SneakyThrows
     @Test
-    void updateTest() {
+    void updateTest() throws Exception {
         when(bookingService.update(anyLong(), anyLong(), anyBoolean()))
                 .thenReturn(bookingDto);
 

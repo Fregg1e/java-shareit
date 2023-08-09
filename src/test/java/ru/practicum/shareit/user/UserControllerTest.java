@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,9 +38,8 @@ class UserControllerTest {
             .email("test@email.test")
             .build();
 
-    @SneakyThrows
     @Test
-    void getAll() {
+    void getAll() throws Exception {
         when(userService.getAll()).thenReturn(List.of(userDto));
 
         mvc.perform(get("/users")
@@ -55,9 +53,8 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].email", is(userDto.getEmail())));
     }
 
-    @SneakyThrows
     @Test
-    void getById() {
+    void getById() throws Exception {
         when(userService.getById(anyLong())).thenReturn(userDto);
 
         mvc.perform(get("/users/{id}", 1)
@@ -70,9 +67,8 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
     }
 
-    @SneakyThrows
     @Test
-    void getByIdNotFound() {
+    void getByIdNotFound() throws Exception {
         when(userService.getById(anyLong())).thenThrow(NotFoundException.class);
 
         mvc.perform(get("/users/{id}", 1)
@@ -82,9 +78,8 @@ class UserControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @SneakyThrows
     @Test
-    void create() {
+    void create() throws Exception {
         UserDto userDtoToCreate = UserDto.builder()
                 .name("test")
                 .email("test@email.test")
@@ -101,9 +96,8 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
     }
 
-    @SneakyThrows
     @Test
-    void createAlreadyExistException() {
+    void createAlreadyExistException() throws Exception {
         UserDto userDtoToCreate = UserDto.builder()
                 .name("test")
                 .email("test@email.test")
@@ -118,9 +112,8 @@ class UserControllerTest {
                 .andExpect(status().isConflict());
     }
 
-    @SneakyThrows
     @Test
-    void update() {
+    void update() throws Exception {
         UserDto userDtoToUpdate = UserDto.builder()
                 .name("test")
                 .email("test@email.test")
@@ -137,9 +130,8 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
     }
 
-    @SneakyThrows
     @Test
-    void updateIfAllFieldIsNull() {
+    void updateIfAllFieldIsNull() throws Exception {
         UserDto userDtoToUpdate = UserDto.builder()
                 .build();
 
@@ -151,9 +143,8 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @SneakyThrows
     @Test
-    void deleteById() {
+    void deleteById() throws Exception {
         mvc.perform(delete("/users/{id}", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

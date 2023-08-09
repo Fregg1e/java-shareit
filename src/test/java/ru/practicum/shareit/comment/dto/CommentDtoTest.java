@@ -1,12 +1,12 @@
 package ru.practicum.shareit.comment.dto;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -17,9 +17,8 @@ class CommentDtoTest {
     @Autowired
     private JacksonTester<CommentDto> jacksonTester;
 
-    @SneakyThrows
     @Test
-    void testCommentDto() {
+    void testCommentDto() throws IOException {
         LocalDateTime created = LocalDateTime.now();
         CommentDto commentDto = CommentDto.builder().id(1L).text("text").authorName("test").created(created).build();
 

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -45,9 +44,8 @@ class ItemControllerTest {
             .authorName("test")
             .build();
 
-    @SneakyThrows
     @Test
-    void getAllTest() {
+    void getAllTest() throws Exception {
         when(itemService.getAll(anyInt(), anyInt())).thenReturn(List.of(itemDto));
 
         mvc.perform(get("/items/all")
@@ -62,9 +60,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$[0].description", is(itemDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void getItemByIdTest() {
+    void getItemByIdTest() throws Exception {
         when(itemService.getItemById(anyLong(), anyLong())).thenReturn(itemDto);
 
         mvc.perform(get("/items/{id}", 1)
@@ -77,9 +74,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.description", is(itemDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void getItemsByUserIdTest() {
+    void getItemsByUserIdTest() throws Exception {
         when(itemService.getItemsByUserId(anyLong(), anyInt(), anyInt())).thenReturn(List.of(itemDto));
 
         mvc.perform(get("/items")
@@ -95,9 +91,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$[0].description", is(itemDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void searchTest() {
+    void searchTest() throws Exception {
         when(itemService.search(anyString(), anyInt(), anyInt())).thenReturn(List.of(itemDto));
 
         mvc.perform(get("/items/search")
@@ -113,9 +108,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$[0].description", is(itemDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void createTest() {
+    void createTest() throws Exception {
         when(itemService.create(anyLong(), any())).thenReturn(itemDto);
 
         mvc.perform(post("/items")
@@ -129,9 +123,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.description", is(itemDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void createWithoutUserIdTest() {
+    void createWithoutUserIdTest() throws Exception {
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -140,9 +133,8 @@ class ItemControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    @SneakyThrows
     @Test
-    void updateTest() {
+    void updateTest() throws Exception {
         when(itemService.update(anyLong(), anyLong(), any())).thenReturn(itemDto);
 
         mvc.perform(patch("/items/{itemId}", 1)
@@ -156,9 +148,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.description", is(itemDto.getDescription())));
     }
 
-    @SneakyThrows
     @Test
-    void updateAccessExceptionTest() {
+    void updateAccessExceptionTest() throws Exception {
         when(itemService.update(anyLong(), anyLong(), any())).thenThrow(AccessException.class);
 
         mvc.perform(patch("/items/{itemId}", 1)
@@ -170,9 +161,8 @@ class ItemControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @SneakyThrows
     @Test
-    void deleteTest() {
+    void deleteTest() throws Exception {
         mvc.perform(delete("/items/{id}", 1)
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -182,9 +172,8 @@ class ItemControllerTest {
         verify(itemService, times(1)).delete(anyLong(), anyLong());
     }
 
-    @SneakyThrows
     @Test
-    void createComment() {
+    void createComment() throws Exception {
         when(itemService.createComment(anyLong(), anyLong(), any())).thenReturn(commentDto);
 
         mvc.perform(post("/items/{itemId}/comment", 1)

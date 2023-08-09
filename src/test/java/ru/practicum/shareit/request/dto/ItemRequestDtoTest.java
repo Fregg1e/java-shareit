@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.dto;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -8,6 +7,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import ru.practicum.shareit.item.dto.ItemDto;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,9 +19,8 @@ class ItemRequestDtoTest {
     @Autowired
     private JacksonTester<ItemRequestDto> jacksonTester;
 
-    @SneakyThrows
     @Test
-    void testItemRequestDto() {
+    void testItemRequestDto() throws IOException {
         LocalDateTime created = LocalDateTime.now();
         List<ItemDto> items = List.of(
                 ItemDto.builder().id(1L).name("1").description("1").available(true).requestId(1L).build(),
