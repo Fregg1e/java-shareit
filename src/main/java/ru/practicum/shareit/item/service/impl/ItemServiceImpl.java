@@ -21,8 +21,11 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.OffsetPageRequest;
 import ru.practicum.shareit.validator.CommentDtoValidator;
 import ru.practicum.shareit.validator.ItemDtoValidator;
 
@@ -39,16 +42,17 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final ItemMapper itemMapper;
     private final BookingMapper bookingMapper;
     private final CommentMapper commentMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getAll() {
-        return itemRepository.findAll().stream()
+    public List<ItemDto> getAll(Integer from, Integer size) {
+        return itemRepository.findAll(new OffsetPageRequest(from, size))
                 .map(itemMapper::toItemDto)
-                .collect(Collectors.toList());
+                .getContent();
     }
 
     @Override
@@ -68,11 +72,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getItemsByUserId(Long userId) {
+    public List<ItemDto> getItemsByUserId(Long userId, Integer from, Integer size) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", userId)));
-        List<ItemDto> itemDtos = itemRepository.findByOwnerId(user.getId()).stream()
+        List<ItemDto> itemDtos = itemRepository.findByOwnerId(user.getId(), new OffsetPageRequest(from, size)).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
         for (ItemDto itemDto : itemDtos) {
@@ -92,11 +96,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text, Integer from, Integer size) {
         if (text.isEmpty() || text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.search(text).stream()
+        return itemRepository.search(text, new OffsetPageRequest(from, size)).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -108,6 +112,12 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", userId)));
         Item item = itemMapper.toItem(itemDto, user);
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException(String.format("Запроса с ID = %d "
+                            + "не существует.", itemDto.getRequestId())));
+            item.setRequest(itemRequest);
+        }
         return itemMapper.toItemDto(itemRepository.save(item));
     }
 
@@ -133,7 +143,6 @@ public class ItemServiceImpl implements ItemService {
             item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
-            ItemDtoValidator.validateAvailable(itemDto);
             item.setAvailable(itemDto.getAvailable());
         }
         log.debug("Вещь с id={} обновлена.", item.getId());
@@ -154,7 +163,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public CommentDto createComment(Long userId, Long itemId,CommentDto commentDto) {
+    public CommentDto createComment(Long userId, Long itemId, CommentDto commentDto) {
         CommentDtoValidator.validateText(commentDto);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId)));

@@ -5,6 +5,7 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,10 +27,33 @@ public class Item {
     private Boolean available;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
-    @ToString.Exclude
     private User owner;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
-    @ToString.Exclude
     private ItemRequest request;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return Objects.equals(id, item.id) && Objects.equals(name, item.name)
+                && Objects.equals(description, item.description) && Objects.equals(available,
+                item.available);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, available);
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", available=" + available +
+                '}';
+    }
 }

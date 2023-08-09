@@ -16,6 +16,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.OffsetPageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getBookingsByUserId(Long userId, BookingState state) {
+    public List<BookingDto> getBookingsByUserId(Long userId, BookingState state, Integer from, Integer size) {
         if (state == null) {
             state = BookingState.ALL;
         }
@@ -40,32 +41,33 @@ public class BookingServiceImpl implements BookingService {
                         + "не существует.", userId)));
         switch (state) {
             case CURRENT:
-                return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                        user.getId(), LocalDateTime.now(), LocalDateTime.now()).stream()
+                return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(user.getId(),
+                                LocalDateTime.now(), LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(user.getId(),
-                        LocalDateTime.now()).stream()
+                                LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case FUTURE:
                 return bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(user.getId(),
-                        LocalDateTime.now()).stream()
+                                LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case WAITING:
                 return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(user.getId(),
-                        BookingStatus.WAITING).stream()
+                                BookingStatus.WAITING, new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case REJECTED:
                 return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(user.getId(),
-                        BookingStatus.REJECTED).stream()
+                                BookingStatus.REJECTED, new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             default:
-                return bookingRepository.findByBookerIdOrderByStartDesc(user.getId()).stream()
+                return bookingRepository.findByBookerIdOrderByStartDesc(user.getId(),
+                                new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
         }
@@ -87,7 +89,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getBookingsByOwnerId(Long ownerId, BookingState state) {
+    public List<BookingDto> getBookingsByOwnerId(Long ownerId, BookingState state, Integer from, Integer size) {
         if (state == null) {
             state = BookingState.ALL;
         }
@@ -96,32 +98,33 @@ public class BookingServiceImpl implements BookingService {
                         + "не существует.", ownerId)));
         switch (state) {
             case CURRENT:
-                return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                        user.getId(), LocalDateTime.now(), LocalDateTime.now()).stream()
+                return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(user.getId(),
+                                LocalDateTime.now(), LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(user.getId(),
-                        LocalDateTime.now()).stream()
+                                LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case FUTURE:
                 return bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(user.getId(),
-                        LocalDateTime.now()).stream()
+                                LocalDateTime.now(), new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case WAITING:
                 return bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(user.getId(),
-                        BookingStatus.WAITING).stream()
+                                BookingStatus.WAITING, new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case REJECTED:
                 return bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(user.getId(),
-                        BookingStatus.REJECTED).stream()
+                                BookingStatus.REJECTED, new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             default:
-                return bookingRepository.findByItemOwnerIdOrderByStartDesc(user.getId()).stream()
+                return bookingRepository.findByItemOwnerIdOrderByStartDesc(user.getId(),
+                                new OffsetPageRequest(from, size)).stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList());
         }

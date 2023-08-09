@@ -21,6 +21,7 @@ public class ItemDto {
     private String description;
     @NotNull(message = "Произошло исключение! Доступность равняется null.")
     private Boolean available;
+    private Long requestId;
     private BookingDto lastBooking;
     private BookingDto nextBooking;
     private List<CommentDto> comments;
