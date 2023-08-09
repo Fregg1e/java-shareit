@@ -46,26 +46,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", userId)));
-        List<ItemRequestDto> requests = itemRequestRepository.findByRequestorIdOrderByCreatedDesc(user.getId()).stream()
-                .map(itemRequestMapper::toItemRequestDto)
+        return itemRequestRepository.findByRequestorIdOrderByCreatedDesc(user.getId()).stream()
+                .map(itemRequestMapper::toItemRequestDto).peek(this::setItemForRequestDto)
                 .collect(Collectors.toList());
-        for (ItemRequestDto requestDto : requests) {
-            setItemForRequestDto(requestDto);
-        }
-        return requests;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ItemRequestDto> getAllRequests(Long userId, Integer from, Integer size) {
-        List<ItemRequestDto> requests = itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(userId,
+        return itemRequestRepository.findByRequestorIdNotOrderByCreatedDesc(userId,
                         new OffsetPageRequest(from, size)).stream()
-                .map(itemRequestMapper::toItemRequestDto)
+                .map(itemRequestMapper::toItemRequestDto).peek(this::setItemForRequestDto)
                 .collect(Collectors.toList());
-        for (ItemRequestDto requestDto : requests) {
-            setItemForRequestDto(requestDto);
-        }
-        return requests;
     }
 
     @Override
