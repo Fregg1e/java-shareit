@@ -1,20 +1,15 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
-@Validated
 @RequiredArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
@@ -22,8 +17,8 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getBookingsByUserId(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
             @RequestParam(value = "state", required = false) BookingState state,
-            @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero Integer from,
-            @RequestParam(value = "size", defaultValue = "20") @Min(1) Integer size) {
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "20") Integer size) {
         return bookingService.getBookingsByUserId(userId, state, from, size);
     }
 
@@ -36,14 +31,14 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> getBookingsByOwnerId(@RequestHeader(value = "X-Sharer-User-Id") Long ownerId,
             @RequestParam(value = "state", required = false) BookingState state,
-            @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero Integer from,
-            @RequestParam(value = "size", defaultValue = "20") @Min(1) Integer size) {
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "20") Integer size) {
         return bookingService.getBookingsByOwnerId(ownerId, state, from, size);
     }
 
     @PostMapping
     public BookingDto create(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
-            @Valid @RequestBody BookingDto bookingDto) {
+            @RequestBody BookingDto bookingDto) {
         return bookingService.create(userId, bookingDto);
     }
 

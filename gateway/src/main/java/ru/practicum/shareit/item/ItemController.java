@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.validator.ItemDtoValidator;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -54,6 +55,13 @@ public class ItemController {
     public ResponseEntity<Object> update(@PathVariable("itemId") Long itemId,
                           @RequestHeader("X-Sharer-User-Id") Long userId,
                           @RequestBody ItemDto itemDto) {
+        ItemDtoValidator.validateAllFieldNotNull(itemDto);
+        if (itemDto.getName() != null) {
+            ItemDtoValidator.validateName(itemDto);
+        }
+        if (itemDto.getDescription() != null) {
+            ItemDtoValidator.validateDescription(itemDto);
+        }
         return client.update(itemId, userId, itemDto);
     }
 
@@ -65,7 +73,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
-            @PathVariable("itemId") Long itemId, @RequestBody CommentDto commentDto) {
+            @PathVariable("itemId") Long itemId, @Valid @RequestBody CommentDto commentDto) {
         return client.createComment(userId, itemId, commentDto);
     }
 }

@@ -26,8 +26,6 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.utils.OffsetPageRequest;
-import ru.practicum.shareit.validator.CommentDtoValidator;
-import ru.practicum.shareit.validator.ItemDtoValidator;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -124,7 +122,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto update(Long itemId, Long userId, ItemDto itemDto) {
-        ItemDtoValidator.validateAllFieldNotNull(itemDto);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d "
                         + "не существует.", userId)));
@@ -135,11 +132,9 @@ public class ItemServiceImpl implements ItemService {
                     + "к вещи с ID = %d.", userId, itemId));
         }
         if (itemDto.getName() != null) {
-            ItemDtoValidator.validateName(itemDto);
             item.setName(itemDto.getName());
         }
         if (itemDto.getDescription() != null) {
-            ItemDtoValidator.validateDescription(itemDto);
             item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
@@ -164,7 +159,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public CommentDto createComment(Long userId, Long itemId, CommentDto commentDto) {
-        CommentDtoValidator.validateText(commentDto);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Вещь с ID = %d не существует.", itemId)));
         User user = userRepository.findById(userId)

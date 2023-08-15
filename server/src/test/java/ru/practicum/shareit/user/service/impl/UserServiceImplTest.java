@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import ru.practicum.shareit.exception.model.AlreadyExistException;
 import ru.practicum.shareit.exception.model.NotFoundException;
-import ru.practicum.shareit.exception.model.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.mapper.impl.UserMapperImpl;
@@ -88,22 +87,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void createTest_whenUserNameEmpty_thenValidationException() {
-        UserDto userDtoToSave = UserDto.builder().name("").email("test@test.test").build();
-
-        assertThrows(ValidationException.class, () -> userService.create(userDtoToSave));
-        Mockito.verify(userRepository, Mockito.never()).save(any());
-    }
-
-    @Test
-    void createTest_whenUserEmailEmpty_thenValidationException() {
-        UserDto userDtoToSave = UserDto.builder().name("test").email("").build();
-
-        assertThrows(ValidationException.class, () -> userService.create(userDtoToSave));
-        Mockito.verify(userRepository, Mockito.never()).save(any());
-    }
-
-    @Test
     void createTest_whenUserEmailAlreadyExist_thenAlreadyExistException() {
         UserDto userDtoToSave = UserDto.builder().name("test").email("test@test.test").build();
         User userToSave = User.builder().name("test").email("test@test.test").build();
@@ -169,17 +152,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateTest_whenUpdateWrongEmail_thenValidationException() {
-        Long userId = 1L;
-        UserDto userDtoToUpdate = UserDto.builder().name("test_update").email("wrong_email_test").build();
-        User userToUpdate = User.builder().id(1L).name("test").email("test@test.test").build();
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
-
-        assertThrows(ValidationException.class, () -> userService.update(userId, userDtoToUpdate));
-        Mockito.verify(userRepository, Mockito.never()).save(any());
-    }
-
-    @Test
     void updateTest_whenUpdateExistEmail_thenAlreadyExistException() {
         Long userId = 1L;
         UserDto userDtoToUpdate = UserDto.builder().name("test_update").email("exist@mail.test").build();
@@ -189,17 +161,6 @@ class UserServiceImplTest {
 
         assertThrows(AlreadyExistException.class, () -> userService.update(userId, userDtoToUpdate));
         Mockito.verify(userRepository, Mockito.times(1)).save(any());
-    }
-
-    @Test
-    void updateTest_whenUpdateEmptyName_thenValidationException() {
-        Long userId = 1L;
-        UserDto userDtoToUpdate = UserDto.builder().name("").build();
-        User userToUpdate = User.builder().id(1L).name("test").email("test@test.test").build();
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
-
-        assertThrows(ValidationException.class, () -> userService.update(userId, userDtoToUpdate));
-        Mockito.verify(userRepository, Mockito.never()).save(any());
     }
 
     @Test

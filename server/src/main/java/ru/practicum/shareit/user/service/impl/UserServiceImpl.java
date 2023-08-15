@@ -12,7 +12,6 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.validator.UserDtoValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +42,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto create(UserDto userDto) {
-        UserDtoValidator.validateUserDto(userDto);
         User user = userMapper.toUser(userDto);
         try {
             user = userRepository.save(user);
@@ -60,11 +58,9 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователя с ID = %d не существует.", id)));
         if (userDto.getEmail() != null) {
-            UserDtoValidator.validateEmail(userDto);
             user.setEmail(userDto.getEmail());
         }
         if (userDto.getName() != null) {
-            UserDtoValidator.validateName(userDto);
             user.setName(userDto.getName());
         }
         try {

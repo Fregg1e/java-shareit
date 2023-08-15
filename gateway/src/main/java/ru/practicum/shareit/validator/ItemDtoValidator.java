@@ -1,9 +1,17 @@
 package ru.practicum.shareit.validator;
 
-import ru.practicum.shareit.exception.model.ValidationException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 public class ItemDtoValidator {
+    
+    public static void validateAllFieldNotNull(ItemDto itemDto) {
+        if (itemDto.getName() == null
+                && itemDto.getDescription() == null
+                && itemDto.getAvailable() == null) {
+            throw new ValidationException("Произошло исключение! Все поля пустые.");
+        }
+    }
 
     public static void validateName(ItemDto itemDto) {
         String name = itemDto.getName();
@@ -17,14 +25,6 @@ public class ItemDtoValidator {
         if (description == null || description.isEmpty() || description.isBlank() || description.length() > 200) {
             throw new ValidationException("Произошло исключение! "
                     + "Описание не может быть пустым или больше 200 символов.");
-        }
-    }
-
-    public static void validateAllFieldNotNull(ItemDto itemDto) {
-        if (itemDto.getName() == null
-                && itemDto.getDescription() == null
-                && itemDto.getAvailable() == null) {
-            throw new ValidationException("Произошло исключение! Все поля пустые.");
         }
     }
 }

@@ -131,19 +131,6 @@ class UserControllerTest {
     }
 
     @Test
-    void updateIfAllFieldIsNull() throws Exception {
-        UserDto userDtoToUpdate = UserDto.builder()
-                .build();
-
-        mvc.perform(patch("/users/{id}", 1)
-                        .content(mapper.writeValueAsString(userDtoToUpdate))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void deleteById() throws Exception {
         mvc.perform(delete("/users/{id}", 1)
                         .characterEncoding(StandardCharsets.UTF_8)

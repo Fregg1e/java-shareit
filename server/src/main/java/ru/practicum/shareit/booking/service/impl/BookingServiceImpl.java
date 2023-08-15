@@ -167,7 +167,7 @@ public class BookingServiceImpl implements BookingService {
             throw new NotAvailableException(String.format("Бронирование с ID = %d "
                     + "не доступно.", bookingId));
         }
-        if (booking.getStatus().equals(BookingStatus.APPROVED) && approved) {
+        if (booking.getStatus().equals(BookingStatus.APPROVED)) {
             throw new NotAvailableException(String.format("Бронирование с ID = %d уже подтверждено!", bookingId));
         }
         if (approved) {

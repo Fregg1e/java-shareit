@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.model.NotAvailableException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -54,35 +55,6 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(bookingDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].status", is(bookingDto.getStatus().toString())));
-    }
-
-    @Test
-    void getBookingsByUserIdWithWrongFromTest() throws Exception {
-
-        mvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", 1)
-                        .param("state", "WAITING")
-                        .param("from", "-1")
-                        .param("size", "2")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-        verify(bookingService, never()).getBookingsByUserId(anyLong(), any(), anyInt(), anyInt());
-    }
-
-    @Test
-    void getBookingsByUserIdWithWrongStateTest() throws Exception {
-        when(bookingService.getBookingsByUserId(anyLong(), any(), anyInt(), anyInt()))
-                .thenReturn(List.of(bookingDto));
-
-        mvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", 1)
-                        .param("state", "WRONG")
-                        .param("from", "0")
-                        .param("size", "2")
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -134,21 +106,17 @@ class BookingControllerTest {
     }
 
     @Test
-    void createBookingNotValidTest() throws Exception {
-        BookingDto wrongBookingDto = BookingDto.builder()
-                .id(1L)
-                .end(LocalDateTime.now().plusDays(2))
-                .status(BookingStatus.WAITING)
-                .build();
+    void createNotAvailableException() throws Exception {
+        when(bookingService.create(anyLong(), any()))
+                .thenThrow(NotAvailableException.class);
 
         mvc.perform(post("/bookings")
-                        .content(mapper.writeValueAsString(wrongBookingDto))
+                        .content(mapper.writeValueAsString(bookingDto))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-        verify(bookingService, never()).create(anyLong(), any());
     }
 
     @Test
