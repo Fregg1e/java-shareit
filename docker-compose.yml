@@ -12,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=root
 
   server:
-    build: /server
+    build: server
     image: java-shareit-server
     container_name: shareit-server
     ports:
@@ -24,7 +24,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
 
   gateway:
-    build: /gateway
+    build: gateway
     image: java-shareit-gateway
     container_name: shareit-gateway
     ports:
