@@ -4,7 +4,6 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 public class ItemDtoValidator {
-    
     public static void validateAllFieldNotNull(ItemDto itemDto) {
         if (itemDto.getName() == null
                 && itemDto.getDescription() == null
