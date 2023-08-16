@@ -15,8 +15,8 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/all")
-    public List<ItemDto> getAll(@RequestParam(value = "from", defaultValue = "0") Integer from,
-            @RequestParam(value = "size", defaultValue = "20") Integer size) {
+    public List<ItemDto> getAll(@RequestParam(value = "from") Integer from,
+            @RequestParam(value = "size") Integer size) {
         return itemService.getAll(from, size);
     }
 
@@ -28,15 +28,15 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getItemsByUserId(@RequestHeader(value = "X-Sharer-User-Id") Long userId,
-            @RequestParam(value = "from", defaultValue = "0") Integer from,
-            @RequestParam(value = "size", defaultValue = "20") Integer size) {
+            @RequestParam(value = "from") Integer from,
+            @RequestParam(value = "size") Integer size) {
         return itemService.getItemsByUserId(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam("text") String text,
-            @RequestParam(value = "from", defaultValue = "0") Integer from,
-            @RequestParam(value = "size", defaultValue = "20") Integer size) {
+            @RequestParam(value = "from") Integer from,
+            @RequestParam(value = "size") Integer size) {
         return itemService.search(text, from, size);
     }
 
