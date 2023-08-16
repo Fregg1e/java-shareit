@@ -32,9 +32,6 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Object> update(@PathVariable("id") Long id, @Valid @RequestBody UserDto userDto) {
-        if (userDto.getEmail() != null) {
-            UserDtoValidator.validateEmail(userDto);
-        }
         if (userDto.getName() != null) {
             UserDtoValidator.validateName(userDto);
         }
